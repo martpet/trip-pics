@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-recess-order",
+    "stylelint-config-css-modules"
+  ],
+  "plugins": [
+    "stylelint-order",
+    "stylelint-use-nesting"
+  ],
+  "rules": {
+    "csstools/use-nesting": "always",
+    "selector-class-pattern": "",
+    "keyframes-name-pattern": ""
+  }
+}

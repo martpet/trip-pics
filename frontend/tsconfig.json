@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "module": "ESNext"
+  },
+  "extends": "../tsconfig.json",
+  "include": [
+    "src",
+    "vite.config.ts",
+    ".eslintrc.js"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "module": "commonjs"
+  },
+  "extends": "../tsconfig.json",
+  "include": [
+    "src",
+    "test",
+    "jest.config.ts",
+    ".eslintrc.js"
+  ],
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ],
+    "transpileOnly": true
+  }
+}
