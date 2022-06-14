@@ -9,4 +9,9 @@ new AppStack(app, 'dev', {
   stackName: 'TripPics',
 });
 
-new PipelineStack(app, 'PipelineStack');
+new PipelineStack(app, 'PipelineStack', {
+  env: {
+    account: '791346621844',
+    region: 'eu-central-1',
+  },
+});
