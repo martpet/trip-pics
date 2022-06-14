@@ -11,7 +11,7 @@ export class PipelineStack extends Stack {
     super(scope, id, props);
 
     const synthStep = new ShellStep('Synth', {
-      input: CodePipelineSource.connection(repo, 'main', { connectionArn }),
+      input: CodePipelineSource.connection(repo, 'staging', { connectionArn }),
       commands: ['npm ci -f', 'npm run synth'],
       primaryOutputDirectory: 'backend/cdk.out',
     });
