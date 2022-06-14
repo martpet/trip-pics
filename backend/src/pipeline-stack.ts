@@ -37,8 +37,8 @@ export class PipelineStack extends Stack {
 
       const pipeline = new CodePipeline(this, `Pipeline-${env}`, {
         pipelineName: env,
-        crossAccountKeys: true,
         synth: synthStep,
+        crossAccountKeys: true,
       });
 
       const stage = new AppStage(this, env, {
