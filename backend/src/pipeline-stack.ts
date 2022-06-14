@@ -4,32 +4,51 @@ import { Construct } from 'constructs';
 
 import { AppStage } from '~/app-stage';
 
+const region = 'eu-central-1';
+const repo = 'martpet/trip-pics';
 const connectionArn =
   'arn:aws:codestar-connections:eu-central-1:791346621844:connection/5d269634-09ef-43bc-9a8f-d7529fb2d4ab';
-const repo = 'martpet/trip-pics';
+
+const envInfo = {
+  production: {
+    account: '766373560006',
+    branch: 'main',
+  },
+  staging: {
+    account: '204115048155',
+    branch: 'staging',
+  },
+};
+
+const envs = Object.keys(envInfo) as Array<keyof typeof envInfo>;
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const synthStep = new ShellStep('Synth', {
-      input: CodePipelineSource.connection(repo, 'main', { connectionArn }),
-      commands: ['npm ci -f', 'npm run synth'],
-      primaryOutputDirectory: 'backend/cdk.out',
-    });
+    envs.forEach((env) => {
+      const { account, branch } = envInfo[env];
 
-    const pipeline = new CodePipeline(this, `Pipeline-prod`, {
-      pipelineName: 'prod',
-      synth: synthStep,
-    });
+      const synthStep = new ShellStep('Synth', {
+        input: CodePipelineSource.connection(repo, branch, { connectionArn }),
+        commands: ['npm ci -f', 'npm run synth'],
+        primaryOutputDirectory: 'backend/cdk.out',
+      });
 
-    const stage = new AppStage(this, 'prod', {
-      env: {
-        account: '766373560006',
-        region: 'u-central-1',
-      },
-    });
+      const pipeline = new CodePipeline(this, `Pipeline-${env}`, {
+        pipelineName: env,
+        synth: synthStep,
+        crossAccountKeys: true,
+      });
 
-    pipeline.addStage(stage);
+      const stage = new AppStage(this, env, {
+        env: {
+          account,
+          region,
+        },
+      });
+
+      pipeline.addStage(stage);
+    });
   }
 }
