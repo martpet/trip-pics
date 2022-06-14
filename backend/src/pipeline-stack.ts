@@ -23,13 +23,14 @@ export class PipelineStack extends Stack {
       const synth = new ShellStep('Synth', {
         input: CodePipelineSource.connection(githubRepo, branch, { connectionArn }),
         commands: ['npm ci -f', 'npm run synth'],
+        primaryOutputDirectory: 'backend/cdk.out',
       });
 
       const pipeline = new CodePipeline(this, env, {
         synth,
       });
 
-      const stage = new AppStage(this, `Stage-${env}`, {
+      const stage = new AppStage(this, `Deploy-env-${env}`, {
         env: { account, region },
       });
 
