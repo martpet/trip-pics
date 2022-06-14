@@ -22,7 +22,7 @@ export class PipelineStack extends Stack {
 
       const synth = new ShellStep('Synth', {
         input: CodePipelineSource.connection(githubRepo, branch, { connectionArn }),
-        commands: ['npm ci', 'npm run synth'],
+        commands: ['npm ci -f', 'npm run synth'],
         primaryOutputDirectory: 'backend/cdk.out',
       });
 
