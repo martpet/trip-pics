@@ -30,7 +30,7 @@ export class PipelineStack extends Stack {
         synth,
       });
 
-      const stage = new AppStage(this, `Stage-${env}`, {
+      const stage = new AppStage(this, `Deploy-env-${env}`, {
         env: { account, region },
       });
 
