@@ -1,4 +1,5 @@
 import { Environment, Stack, StackProps } from 'aws-cdk-lib';
+import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
@@ -32,10 +33,23 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     primaryOutputDirectory: 'backend/cdk.out',
   });
 
+  const partialBuildSpec = BuildSpec.fromObject({
+    phases: {
+      install: {
+        'runtime-versions': {
+          nodejs: '14',
+        },
+      },
+    },
+  });
+
   const pipeline = new CodePipeline(scope, `Pipeline-${name}`, {
     synth,
     pipelineName: name,
     crossAccountKeys: true,
+    synthCodeBuildDefaults: {
+      partialBuildSpec,
+    },
   });
 
   pipeline.addStage(new AppStage(scope, name, { env }));
