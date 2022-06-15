@@ -17,7 +17,7 @@
     "test:backend": "jest --config=backend/jest.config.ts",
     "build:frontend": "vite build frontend",
     "synth": "cd backend && npx cdk synth",
-    "deploy:dev": "cd backend && npx cdk deploy dev",
+    "deploy": "cd backend && npx cdk deploy dev",
     "prepare": "husky install"
   },
   "dependencies": {
