@@ -1,6 +1,6 @@
 # <Project name>
 ## Setup project
-`npm install`
+`npm i -f`
 ## Run frontend
 `npm start`
 ## Preview backend changes locally
