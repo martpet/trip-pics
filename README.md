@@ -1,11 +1,11 @@
 # TripPics
 ## Setup
-`npm install -f`
+`npm install --force`
 ## Run frontend
 `npm start`
 ## Preview backend changes
 ### Bootstrap your dev AWS environment
-**Skip this step if** the AWS account/region already contains a stack named `CDKToolkit`.
+**Skip this step if** the AWS account/region already contains a stack named *CDKToolkit*.
 
 (Admin permissions required)
 
