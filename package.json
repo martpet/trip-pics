@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "vite serve frontend",
-    "test": "npm run check-types && npm run lint && npm test",
+    "test": "npm run check-types && npm run lint && npm run test:frontend npm run test:backend",
     "check-types": "npm run check-types:frontend && npm run check-types:backend",
     "check-types:frontend": "tsc --project frontend/tsconfig.json",
     "check-types:backend": "tsc --project backend/tsconfig.json",
