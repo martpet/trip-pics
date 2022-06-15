@@ -11,13 +11,10 @@ interface PipelineStackProps extends StackProps {
 interface PipelineProps {
   name: string;
   branch: string;
+  repo: string;
+  connectionArn: string;
   env: Environment;
 }
-
-const connectionArn =
-  'arn:aws:codestar-connections:eu-central-1:791346621844:connection/5d269634-09ef-43bc-9a8f-d7529fb2d4ab';
-
-const repo = 'martpet/trip-pics';
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, { pipelines, ...props }: PipelineStackProps) {
@@ -26,17 +23,20 @@ export class PipelineStack extends Stack {
   }
 }
 
-function createPipeline(stack: Stack, { name, env, branch }: PipelineProps) {
+function createPipeline(scope: Stack, props: PipelineProps) {
+  const { name, branch, repo, connectionArn, env } = props;
+
   const synth = new ShellStep('Synth', {
     input: CodePipelineSource.connection(repo, branch, { connectionArn }),
     commands: ['npm ci -f', 'npm run synth'],
     primaryOutputDirectory: 'backend/cdk.out',
   });
-  const pipeline = new CodePipeline(stack, `Pipeline-${name}`, {
+
+  const pipeline = new CodePipeline(scope, `Pipeline-${name}`, {
     synth,
     pipelineName: name,
     crossAccountKeys: true,
   });
-  const stage = new AppStage(stack, name, { env });
-  pipeline.addStage(stage);
+
+  pipeline.addStage(new AppStage(scope, name, { env }));
 }
