@@ -1,11 +1,10 @@
-import { Environment, Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps } from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
-import { AppStage } from '~/pipeline/stage';
-
-export const appName = 'TripPics';
+import { appName, connectionArn, nodejsVersion, region, sourceRepo } from '~/consts';
+import { AppStage } from '~/pipeline-stack/pipeline-stage';
 
 interface PipelineStackProps extends StackProps {
   pipelines: PipelineProps[];
@@ -13,10 +12,8 @@ interface PipelineStackProps extends StackProps {
 
 interface PipelineProps {
   envName: string;
-  branch: string;
-  repo: string;
-  connectionArn: string;
-  env: Environment;
+  sourceBranch: string;
+  account: string;
 }
 
 export class PipelineStack extends Stack {
@@ -27,17 +24,17 @@ export class PipelineStack extends Stack {
 }
 
 function createPipeline(scope: Stack, props: PipelineProps) {
-  const { envName, branch, repo, connectionArn, env } = props;
+  const { envName, sourceBranch, account } = props;
   const capitalizedEnvName = envName.charAt(0).toUpperCase() + envName.slice(1);
 
-  const synth = new ShellStep('Synth', {
-    input: CodePipelineSource.connection(repo, branch, { connectionArn }),
+  const synthStep = new ShellStep('Synth', {
+    input: CodePipelineSource.connection(sourceRepo, sourceBranch, { connectionArn }),
     commands: ['npm ci -f', 'npm run synth'],
     primaryOutputDirectory: 'backend/cdk.out',
   });
 
   const pipeline = new CodePipeline(scope, capitalizedEnvName, {
-    synth,
+    synth: synthStep,
     pipelineName: capitalizedEnvName,
     crossAccountKeys: true,
     synthCodeBuildDefaults: {
@@ -45,7 +42,7 @@ function createPipeline(scope: Stack, props: PipelineProps) {
         phases: {
           install: {
             'runtime-versions': {
-              nodejs: '14',
+              nodejs: nodejsVersion,
             },
           },
         },
@@ -53,5 +50,11 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     },
   });
 
-  pipeline.addStage(new AppStage(scope, `${appName}-${capitalizedEnvName}`, { env }));
+  const appStageId = `${appName}-${capitalizedEnvName}`;
+
+  const appStage = new AppStage(scope, appStageId, {
+    env: { account, region },
+  });
+
+  pipeline.addStage(appStage);
 }
