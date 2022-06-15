@@ -3,14 +3,13 @@ import { App } from 'aws-cdk-lib';
 import { AppStack } from '~/app-stack';
 import { PipelineStack } from '~/pipeline';
 
-const app = new App();
 const repo = 'martpet/trip-pics';
 const region = 'eu-central-1';
 const connectionArn =
   'arn:aws:codestar-connections:eu-central-1:791346621844:connection/5d269634-09ef-43bc-9a8f-d7529fb2d4ab';
 
-const prodPipelineProps = {
-  name: 'production',
+const propProps = {
+  envName: 'production',
   branch: 'main',
   repo,
   connectionArn,
@@ -20,8 +19,8 @@ const prodPipelineProps = {
   },
 };
 
-const stagingPipelineProps = {
-  name: 'staging',
+const stagingProps = {
+  envName: 'staging',
   branch: 'staging',
   repo,
   connectionArn,
@@ -31,14 +30,14 @@ const stagingPipelineProps = {
   },
 };
 
-new PipelineStack(app, 'PipelineStack', {
-  pipelines: [prodPipelineProps, stagingPipelineProps],
+const app = new App();
+
+new PipelineStack(app, 'TripPicsPipeline', {
+  pipelines: [propProps, stagingProps],
   env: {
     account: '791346621844',
     region,
   },
 });
 
-new AppStack(app, 'dev', {
-  stackName: 'TripPics',
-});
+new AppStack(app, 'TripPicsDev');

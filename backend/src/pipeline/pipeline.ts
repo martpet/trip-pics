@@ -3,14 +3,14 @@ import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
-import { AppStage } from '~/pipeline';
+import { AppStage } from '~/pipeline/stage';
 
 interface PipelineStackProps extends StackProps {
   pipelines: PipelineProps[];
 }
 
 interface PipelineProps {
-  name: string;
+  envName: string;
   branch: string;
   repo: string;
   connectionArn: string;
@@ -25,7 +25,8 @@ export class PipelineStack extends Stack {
 }
 
 function createPipeline(scope: Stack, props: PipelineProps) {
-  const { name, branch, repo, connectionArn, env } = props;
+  const { envName, branch, repo, connectionArn, env } = props;
+  const capitalizedEnvName = envName.charAt(0).toUpperCase() + envName.slice(1);
 
   const synth = new ShellStep('Synth', {
     input: CodePipelineSource.connection(repo, branch, { connectionArn }),
@@ -33,24 +34,22 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     primaryOutputDirectory: 'backend/cdk.out',
   });
 
-  const partialBuildSpec = BuildSpec.fromObject({
-    phases: {
-      install: {
-        'runtime-versions': {
-          nodejs: '14',
-        },
-      },
-    },
-  });
-
-  const pipeline = new CodePipeline(scope, `Pipeline-${name}`, {
+  const pipeline = new CodePipeline(scope, capitalizedEnvName, {
     synth,
-    pipelineName: name,
+    pipelineName: capitalizedEnvName,
     crossAccountKeys: true,
     synthCodeBuildDefaults: {
-      partialBuildSpec,
+      partialBuildSpec: BuildSpec.fromObject({
+        phases: {
+          install: {
+            'runtime-versions': {
+              nodejs: '14',
+            },
+          },
+        },
+      }),
     },
   });
 
-  pipeline.addStage(new AppStage(scope, name, { env }));
+  pipeline.addStage(new AppStage(scope, `TripPics${capitalizedEnvName}`, { env }));
 }

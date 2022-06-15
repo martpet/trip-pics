@@ -1,13 +1,15 @@
-# <Project name>
-## Setup project
-`npm i -f`
+# TripPics
+## Setup
+`npm install -f`
 ## Run frontend
 `npm start`
-## Preview backend changes locally
-### Bootstrap your AWS account
-**Skip this step if** the AWS account region already contains a stack `CDKToolkit`.
-In `backend` dir run: `npx cdk bootstrap --profile my-aws-profile` (Admin permissions required)
+## Preview backend changes
+### Bootstrap your dev AWS environment
+**Skip this step if** the AWS account/region already contains a stack named `CDKToolkit`.
+(Admin permissions required)
+In `backend/`: `npx cdk bootstrap --profile my-aws-profile` 
 ### Deploy changes
-In `backend` dir run: `npx cdk deploy dev --profile my-aws-profile` (Admin permissions NOT required)
+(Admin permissions NOT required)
+In `backend/`: `npx cdk deploy TripPicsDev --profile my-aws-profile`
 ### Change frontend env vars
 TODO
