@@ -5,6 +5,8 @@ import { Construct } from 'constructs';
 
 import { AppStage } from '~/pipeline/stage';
 
+export const appName = 'TripPics';
+
 interface PipelineStackProps extends StackProps {
   pipelines: PipelineProps[];
 }
@@ -51,5 +53,5 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     },
   });
 
-  pipeline.addStage(new AppStage(scope, `TripPics-${capitalizedEnvName}`, { env }));
+  pipeline.addStage(new AppStage(scope, `${appName}-${capitalizedEnvName}`, { env }));
 }
