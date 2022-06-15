@@ -1,7 +1,7 @@
 import { App } from 'aws-cdk-lib';
 
 import { AppStack } from '~/app-stack';
-import { PipelineStack } from '~/pipeline-stack';
+import { PipelineStack } from '~/pipeline';
 
 const app = new App();
 const region = 'eu-central-1';
