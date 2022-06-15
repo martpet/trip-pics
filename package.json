@@ -1,6 +1,9 @@
 {
   "name": "trippics",
   "version": "0.0.0",
+  "engines": {
+    "node": "14"
+  },
   "scripts": {
     "start": "vite serve frontend",
     "test": "npm run check-types && npm run lint && npm run test:frontend npm run test:backend",

@@ -1,12 +1,12 @@
 import { Stage, StageProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { AppStack } from '~/app-stack/app-stack';
+import { AppStack } from '~/app-stack';
 
 export class AppStage extends Stage {
   constructor(scope: Construct, id: string, props?: StageProps) {
     super(scope, id, props);
 
-    new AppStack(this, 'AppStack');
+    new AppStack(this, 'App');
   }
 }
