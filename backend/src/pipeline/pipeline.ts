@@ -51,5 +51,5 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     },
   });
 
-  pipeline.addStage(new AppStage(scope, `${capitalizedEnvName}Stage`, { env }));
+  pipeline.addStage(new AppStage(scope, `TripPics${capitalizedEnvName}`, { env }));
 }

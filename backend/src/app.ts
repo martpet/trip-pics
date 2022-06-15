@@ -32,7 +32,7 @@ const stagingProps = {
 
 const app = new App();
 
-new PipelineStack(app, 'TripPics', {
+new PipelineStack(app, 'TripPicsPipeline', {
   pipelines: [propProps, stagingProps],
   env: {
     account: '791346621844',
@@ -40,6 +40,4 @@ new PipelineStack(app, 'TripPics', {
   },
 });
 
-new AppStack(app, 'dev', {
-  stackName: 'TripPics',
-});
+new AppStack(app, 'TripPicsDev');
