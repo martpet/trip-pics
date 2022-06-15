@@ -10,6 +10,6 @@
 In `backend/`: `npx cdk bootstrap --profile my-aws-profile` 
 ### Deploy changes
 (Admin permissions NOT required)
-In `backend/`: `npx cdk deploy TripPicsDev --profile my-aws-profile`
+In `backend/`: `npx cdk deploy dev --profile my-aws-profile`
 ### Change frontend env vars
 TODO
