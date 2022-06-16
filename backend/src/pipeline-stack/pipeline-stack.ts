@@ -1,9 +1,9 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Environment, Stack, StackProps } from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
-import { appName, connectionArn, nodejsVersion, region, sourceRepo } from '~/consts';
+import { appName, connectionArn, nodejsVersion, sourceRepo } from '~/consts';
 import { AppStage } from '~/pipeline-stack/pipeline-stage';
 
 interface PipelineStackProps extends StackProps {
@@ -13,7 +13,7 @@ interface PipelineStackProps extends StackProps {
 interface PipelineProps {
   envName: string;
   sourceBranch: string;
-  account: string;
+  stageEnv: Environment;
 }
 
 export class PipelineStack extends Stack {
@@ -24,8 +24,7 @@ export class PipelineStack extends Stack {
 }
 
 function createPipeline(scope: Stack, props: PipelineProps) {
-  const { envName, sourceBranch, account } = props;
-  const capitalizedEnvName = envName.charAt(0).toUpperCase() + envName.slice(1);
+  const { envName, sourceBranch, stageEnv } = props;
 
   const synthStep = new ShellStep('Synth', {
     input: CodePipelineSource.connection(sourceRepo, sourceBranch, { connectionArn }),
@@ -33,9 +32,9 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     primaryOutputDirectory: 'backend/cdk.out',
   });
 
-  const pipeline = new CodePipeline(scope, capitalizedEnvName, {
+  const pipeline = new CodePipeline(scope, envName, {
     synth: synthStep,
-    pipelineName: capitalizedEnvName,
+    pipelineName: envName,
     crossAccountKeys: true,
     synthCodeBuildDefaults: {
       partialBuildSpec: BuildSpec.fromObject({
@@ -50,10 +49,8 @@ function createPipeline(scope: Stack, props: PipelineProps) {
     },
   });
 
-  const appStageId = `${appName}-${capitalizedEnvName}`;
-
-  const appStage = new AppStage(scope, appStageId, {
-    env: { account, region },
+  const appStage = new AppStage(scope, `${appName}-${envName}`, {
+    env: stageEnv,
   });
 
   pipeline.addStage(appStage);
