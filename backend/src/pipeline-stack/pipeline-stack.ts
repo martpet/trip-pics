@@ -1,57 +1,52 @@
-import { Environment, Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps } from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
-import { appName, connectionArn, nodejsVersion, sourceRepo } from '~/consts';
+import { appName, connectionArn, nodejs, sourceRepo } from '~/consts';
 import { AppStage } from '~/pipeline-stack/pipeline-stage';
+import { PipelineDeploymentProps } from '~/types';
 
 interface PipelineStackProps extends StackProps {
-  pipelines: PipelineProps[];
-}
-
-interface PipelineProps {
-  envName: string;
-  sourceBranch: string;
-  stageEnv: Environment;
+  pipelines: PipelineDeploymentProps[];
 }
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, { pipelines, ...props }: PipelineStackProps) {
     super(scope, id, props);
-    pipelines.forEach((pipelineProps) => createPipeline(this, pipelineProps));
+    pipelines.forEach((options) => createPipeline(this, options));
   }
 }
 
-function createPipeline(scope: Stack, props: PipelineProps) {
-  const { envName, sourceBranch, stageEnv } = props;
+function createPipeline(scope: Stack, props: PipelineDeploymentProps) {
+  const { pipelineName, sourceBranch, stageEnv } = props;
+  const appStageName = `${appName}-${pipelineName}`;
 
-  const synthStep = new ShellStep('Synth', {
-    input: CodePipelineSource.connection(sourceRepo, sourceBranch, { connectionArn }),
+  const input = CodePipelineSource.connection(sourceRepo, sourceBranch, {
+    connectionArn,
+  });
+
+  const synth = new ShellStep('Synth', {
+    input,
     commands: ['npm ci -f', 'npm run synth'],
     primaryOutputDirectory: 'backend/cdk.out',
   });
 
-  const pipeline = new CodePipeline(scope, envName, {
-    synth: synthStep,
-    pipelineName: envName,
+  const synthCodeBuildDefaults = {
+    partialBuildSpec: BuildSpec.fromObject({
+      phases: { install: { 'runtime-versions': { nodejs } } },
+    }),
+  };
+
+  const pipeline = new CodePipeline(scope, pipelineName, {
+    synth,
+    synthCodeBuildDefaults,
     crossAccountKeys: true,
-    synthCodeBuildDefaults: {
-      partialBuildSpec: BuildSpec.fromObject({
-        phases: {
-          install: {
-            'runtime-versions': {
-              nodejs: nodejsVersion,
-            },
-          },
-        },
-      }),
-    },
   });
 
-  const appStage = new AppStage(scope, `${appName}-${envName}`, {
-    env: stageEnv,
-  });
-
-  pipeline.addStage(appStage);
+  pipeline.addStage(
+    new AppStage(scope, appStageName, {
+      env: stageEnv,
+    })
+  );
 }
