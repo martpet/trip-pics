@@ -1,6 +1,8 @@
 # TripPics
 ## Setup
 `npm install --force`
+
+(Temporarily use --force)
 ## Run frontend
 `npm start`
 ## Preview backend changes
