@@ -15,6 +15,7 @@
     "lint:backend": "eslint backend",
     "test:frontend": "",
     "test:backend": "jest --config=backend/jest.config.ts",
+    "build": "npm run build:frontend && npm run synth",
     "build:frontend": "vite build frontend",
     "synth": "cd backend && npx cdk synth",
     "deploy": "cd backend && npx cdk deploy dev",
