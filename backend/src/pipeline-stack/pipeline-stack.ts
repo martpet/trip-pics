@@ -1,5 +1,7 @@
+import { CodePipelinePostToGitHub } from '@awesome-cdk/cdk-report-codepipeline-status-to-github';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
@@ -12,42 +14,46 @@ interface PipelineStackProps extends StackProps {
 }
 
 export class PipelineStack extends Stack {
-  constructor(scope: Construct, id: string, { pipelines, ...props }: PipelineStackProps) {
+  constructor(scope: Construct, id: string, props: PipelineStackProps) {
     super(scope, id, props);
-    pipelines.forEach((options) => createPipeline(this, options));
+    props.pipelines.forEach((options) => createPipeline(this, options));
   }
 }
 
 function createPipeline(scope: Stack, props: PipelineDeploymentProps) {
   const { pipelineName, sourceBranch, stageEnv } = props;
-  const appStageName = `${appName}-${pipelineName}`;
 
-  const input = CodePipelineSource.connection(sourceRepo, sourceBranch, {
-    connectionArn,
-  });
-
-  const synth = new ShellStep('Synth', {
-    input,
+  const synthStep = new ShellStep('Synth', {
+    input: CodePipelineSource.connection(sourceRepo, sourceBranch, {
+      connectionArn,
+    }),
     commands: ['npm ci -f', 'npm run synth'],
     primaryOutputDirectory: 'backend/cdk.out',
   });
 
-  const synthCodeBuildDefaults = {
-    partialBuildSpec: BuildSpec.fromObject({
-      phases: { install: { 'runtime-versions': { nodejs } } },
-    }),
-  };
-
   const pipeline = new CodePipeline(scope, pipelineName, {
-    synth,
-    synthCodeBuildDefaults,
+    synth: synthStep,
     crossAccountKeys: true,
     pipelineName,
+    synthCodeBuildDefaults: {
+      partialBuildSpec: BuildSpec.fromObject({
+        phases: { install: { 'runtime-versions': { nodejs } } },
+      }),
+    },
   });
 
   pipeline.addStage(
-    new AppStage(scope, appStageName, {
+    new AppStage(scope, `${appName}-${pipelineName}`, {
       env: stageEnv,
     })
   );
+
+  new CodePipelinePostToGitHub(pipeline, 'CodePipelinePostToGitHub', {
+    pipeline,
+    githubToken: StringParameter.fromStringParameterName(
+      scope,
+      'GitHubToken',
+      'GITHUB_TOKEN'
+    ),
+  });
 }
