@@ -22,7 +22,6 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@awesome-cdk/cdk-report-codepipeline-status-to-github": "^1.0.8",
     "aws-cdk-lib": "^2.27.0",
     "constructs": "^10.1.32",
     "react": "^18.0.0",
