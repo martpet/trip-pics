@@ -1,18 +1,22 @@
+import { Environment } from 'aws-cdk-lib';
+
+import { PipelineDeploymentProps } from '~/types';
+
 import packageJson from '../../package.json';
 
-export const nodejsVersion = packageJson.engines.node;
+export const nodejs = packageJson.engines.node;
 
 export const appName = 'TripPics';
 export const sourceRepo = 'martpet/trip-pics';
 export const region = 'eu-central-1';
 
-export const pipelineEnv = {
+export const pipelineStackEnv: Environment = {
   account: '791346621844',
   region,
 };
 
-export const prodPipelineProps = {
-  envName: 'Production',
+export const productionPipelineProps: PipelineDeploymentProps = {
+  pipelineName: 'Production',
   sourceBranch: 'main',
   stageEnv: {
     account: '766373560006',
@@ -20,9 +24,9 @@ export const prodPipelineProps = {
   },
 };
 
-export const stagingPipelineProps = {
-  envName: 'Staging',
-  sourceBranch: 'staging',
+export const stagingPipelineProps: PipelineDeploymentProps = {
+  pipelineName: 'Staging',
+  sourceBranch: 'develop',
   stageEnv: {
     account: '204115048155',
     region,
