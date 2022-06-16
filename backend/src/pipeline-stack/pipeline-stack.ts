@@ -42,6 +42,7 @@ function createPipeline(scope: Stack, props: PipelineDeploymentProps) {
     synth,
     synthCodeBuildDefaults,
     crossAccountKeys: true,
+    pipelineName,
   });
 
   pipeline.addStage(
