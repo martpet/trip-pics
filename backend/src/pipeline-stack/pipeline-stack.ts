@@ -1,7 +1,5 @@
-import { CodePipelinePostToGitHub } from '@awesome-cdk/cdk-report-codepipeline-status-to-github';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
@@ -47,13 +45,4 @@ function createPipeline(scope: Stack, props: PipelineDeploymentProps) {
       env: stageEnv,
     })
   );
-
-  new CodePipelinePostToGitHub(pipeline, 'CodePipelinePostToGitHub', {
-    pipeline,
-    githubToken: StringParameter.fromStringParameterName(
-      scope,
-      'GitHubToken',
-      'GITHUB_TOKEN'
-    ),
-  });
 }
