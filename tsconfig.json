@@ -12,9 +12,8 @@
     "moduleResolution": "node",
     "noEmit": true,
     "paths": {
-      "~/*": [
-        "./*"
-      ]
+      "~/*": [ "./*" ],
+      "constructs": ["../../node_modules/constructs"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

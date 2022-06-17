@@ -1,20 +1,19 @@
 import { App } from 'aws-cdk-lib';
 
-import { AppStack } from '~/app-stack';
 import {
   appName,
   pipelineStackEnv,
-  productionPipelineProps,
+  prodPipelineProps,
   stagingPipelineProps,
 } from '~/consts';
-import { PipelineStack } from '~/pipeline-stack';
+import { AppStack, PipelineStack } from '~/stacks';
 
 const app = new App();
 
 new PipelineStack(app, 'pipeline', {
   stackName: `${appName}-PipelineStack`,
   env: pipelineStackEnv,
-  pipelines: [productionPipelineProps, stagingPipelineProps],
+  pipelinesProps: [prodPipelineProps, stagingPipelineProps],
 });
 
 new AppStack(app, 'dev', {
