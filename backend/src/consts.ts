@@ -1,6 +1,6 @@
 import { Environment } from 'aws-cdk-lib';
 
-import { PipelineDeploymentProps } from '~/types';
+import { AppPipelineProps } from '~/constructs/AppPipeline/AppPipeline';
 
 import packageJson from '../../package.json';
 
@@ -15,19 +15,19 @@ export const pipelineStackEnv: Environment = {
   region,
 };
 
-export const productionPipelineProps: PipelineDeploymentProps = {
-  pipelineName: 'Production',
-  sourceBranch: 'main',
-  stageEnv: {
+export const prodPipelineProps: AppPipelineProps = {
+  name: 'Production',
+  branch: 'main',
+  env: {
     account: '766373560006',
     region,
   },
 };
 
-export const stagingPipelineProps: PipelineDeploymentProps = {
-  pipelineName: 'Staging',
-  sourceBranch: 'develop',
-  stageEnv: {
+export const stagingPipelineProps: AppPipelineProps = {
+  name: 'Staging',
+  branch: 'develop',
+  env: {
     account: '204115048155',
     region,
   },
