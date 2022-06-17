@@ -33,5 +33,5 @@ new PipelineStack(app, 'pipeline', {
 });
 
 new AppStack(app, 'dev', {
-  stackName: `${appName}-Dev`,
+  stackName: `${appName}-Dev-App`,
 });
