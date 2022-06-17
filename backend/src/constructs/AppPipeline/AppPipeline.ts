@@ -5,6 +5,7 @@ import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelin
 import { Construct } from 'constructs';
 
 import { DeployStage } from '~/constructs';
+import { appName } from '~/consts';
 
 export interface AppPipelineProps {
   envName: string;
@@ -63,7 +64,7 @@ export class AppPipeline extends Construct {
       selfMutation: false,
     });
 
-    codePipeline.addStage(new DeployStage(scope, `Deploy-${envName}`, { env }));
+    codePipeline.addStage(new DeployStage(scope, `${appName}-${envName}`, { env }));
 
     if (pipelineStatusGitIntegration) {
       // Temp solution, until CDK v2 is supported:
