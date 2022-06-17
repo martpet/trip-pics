@@ -1,2 +1,2 @@
 export * from './AppPipeline';
-export * from './AppPipelineStage';
+export * from './DeployStage';

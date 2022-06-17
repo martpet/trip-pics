@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 
 import { AppStack } from '~/stacks/AppStack';
 
-export class AppPipelineStage extends Stage {
+export class DeployStage extends Stage {
   constructor(scope: Construct, id: string, props?: StageProps) {
     super(scope, id, props);
 
