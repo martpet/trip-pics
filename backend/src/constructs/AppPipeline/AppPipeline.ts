@@ -1,23 +1,43 @@
 import { Environment } from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
+import { CfnInclude } from 'aws-cdk-lib/cloudformation-include';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
 import { DeployStage } from '~/constructs';
-import { connectionArn, nodejs, sourceRepo } from '~/consts';
 
 export interface AppPipelineProps {
-  name: string;
-  branch: string;
+  envName: string;
   env: Environment;
+  branch: string;
+  repo: string;
+  nodejs: string;
+  connectionArn: string;
+  buildStatusToGitParams?: {
+    IntegrationType: 'GitHub' | 'BitBucket';
+    IntegrationUser: string;
+    IntegrationPass: string;
+  };
 }
 
 export class AppPipeline extends Construct {
-  constructor(scope: Construct, id: string, { name, branch, env }: AppPipelineProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    {
+      envName,
+      branch,
+      repo,
+      env,
+      nodejs,
+      buildStatusToGitParams,
+      connectionArn,
+    }: AppPipelineProps
+  ) {
     super(scope, id);
 
     const synthStep = new ShellStep('Synth', {
-      input: CodePipelineSource.connection(sourceRepo, branch, { connectionArn }),
+      input: CodePipelineSource.connection(repo, branch, { connectionArn }),
       commands: ['npm ci -f', 'npm run synth'],
       primaryOutputDirectory: 'backend/cdk.out',
     });
@@ -34,16 +54,28 @@ export class AppPipeline extends Construct {
       }),
     };
 
-    const pipeline = new CodePipeline(scope, name, {
+    const pipelineName = envName;
+
+    const codePipeline = new CodePipeline(scope, envName, {
       synth: synthStep,
-      pipelineName: name,
+      pipelineName,
       synthCodeBuildDefaults,
       crossAccountKeys: true,
       selfMutation: false,
     });
 
-    const deployStage = new DeployStage(scope, `Deploy-${name}`, { env });
+    codePipeline.addStage(new DeployStage(scope, `Deploy-${envName}`, { env }));
 
-    pipeline.addStage(deployStage);
+    if (buildStatusToGitParams) {
+      new CfnInclude(scope, `BuildStatusToGitHub-${envName}`, {
+        templateFile: `${__dirname}/git-build-status.yml`,
+        preserveLogicalIds: false,
+        parameters: {
+          ...buildStatusToGitParams,
+          PipelineName: pipelineName,
+          EncryptionAtRest: false,
+        },
+      });
+    }
   }
 }
