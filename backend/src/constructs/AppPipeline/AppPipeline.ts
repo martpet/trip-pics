@@ -39,6 +39,7 @@ export class AppPipeline extends Construct {
       pipelineName: name,
       synthCodeBuildDefaults,
       crossAccountKeys: true,
+      selfMutation: false,
     });
 
     const stage = new AppPipelineStage(scope, `Deploy-${name}`, { env });
