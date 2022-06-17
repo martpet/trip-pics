@@ -13,10 +13,9 @@ export interface AppPipelineProps {
   repo: string;
   nodejs: string;
   connectionArn: string;
-  buildStatusToGitParams?: {
+  pipelineStatusGitIntegration?: {
     IntegrationType: 'GitHub' | 'BitBucket';
-    IntegrationUser: string;
-    IntegrationPass: string;
+    GitTokenSsmArn: string;
   };
 }
 
@@ -30,7 +29,7 @@ export class AppPipeline extends Construct {
       repo,
       env,
       nodejs,
-      buildStatusToGitParams,
+      pipelineStatusGitIntegration,
       connectionArn,
     }: AppPipelineProps
   ) {
@@ -66,12 +65,14 @@ export class AppPipeline extends Construct {
 
     codePipeline.addStage(new DeployStage(scope, `Deploy-${envName}`, { env }));
 
-    if (buildStatusToGitParams) {
-      new CfnInclude(scope, `BuildStatusToGitHub-${envName}`, {
-        templateFile: `${__dirname}/git-build-status.yml`,
+    if (pipelineStatusGitIntegration) {
+      // Temp solution, until CDK v2 is supported:
+      // https://www.npmjs.com/package/@neweracode/cdk-codepipeline-github
+      new CfnInclude(scope, `${envName}-PipelineStatusGitIntegration`, {
+        templateFile: `${__dirname}/pipeline-status-git-integration.yml`,
         preserveLogicalIds: false,
         parameters: {
-          ...buildStatusToGitParams,
+          ...pipelineStatusGitIntegration,
           PipelineName: pipelineName,
           EncryptionAtRest: false,
         },

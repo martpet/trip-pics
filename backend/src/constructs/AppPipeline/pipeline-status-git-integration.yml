@@ -1,7 +1,6 @@
 # https://github.com/aws-samples/aws-blog-codepipeline-third-party-git-build-status
 
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Lambda for Pipeline Integrations.
 Parameters:
   IntegrationType:
     Type: String
@@ -9,20 +8,14 @@ Parameters:
       - "Bitbucket"
       - "GitHub"
     Description: Enter Bitbucket or GitHub
-  IntegrationUser:
-    NoEcho: true
-    Type: String
-    MinLength: 1
-    Description: Enter Bitbucket or GitHub API username
-  IntegrationPass:
-    NoEcho: true
-    Type: String
-    MinLength: 1
-    Description: Enter Bitbucket or GitHub API password
   PipelineName:
     Type: String
     MinLength: 1
     Description: Name of CodePipeline pipeline
+  GitTokenSsmArn:
+    Type: String
+    MinLength: 1
+    Description: Git token ARN
   EncryptionAtRest:
     Type: String
     Default: "Yes"
@@ -132,6 +125,10 @@ Resources:
                 Action:
                   - codepipeline:GetPipelineExecution
                 Resource: arn:aws:codepipeline:*:*:*
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: !Ref GitTokenSsmArn
   PipelineNotificationRule:
     Type: 'AWS::CodeStarNotifications::NotificationRule'
     Properties:
@@ -166,10 +163,8 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          INTEGRATION_AUTH_USER: !Ref IntegrationUser
-          INTEGRATION_AUTH_PASS: !Ref IntegrationPass
           INTEGRATION_TYPE: !Ref IntegrationType
-
+          GIT_TOKEN_SSM_ARN: !Ref GitTokenSsmArn
       Code:
         ZipFile: |
           from __future__ import print_function
@@ -181,10 +176,9 @@ Resources:
           from base64 import b64encode
 
           codepipeline_client = boto3.client('codepipeline')
-          integration_user = os.environ['INTEGRATION_AUTH_USER']
-          integration_pass = os.environ['INTEGRATION_AUTH_PASS']
+          ssm_client = boto3.client('ssm')
           integration_type = os.environ['INTEGRATION_TYPE']
-          user_pass = integration_user+":"+integration_pass
+          git_token_ssm_key = os.environ['GIT_TOKEN_SSM_ARN'].split('parameter')[1]
 
 
           region = os.environ['AWS_REGION']
@@ -244,18 +238,16 @@ Resources:
 
               build_status={}
               build_status['state'] = state
-              build_status['context'] = "CodePipeline"
+              build_status['context'] = "AWS CodePipeline"
               build_status['description'] = data['detail']['pipeline']
               build_status['target_url'] = "https://" + region + ".console.aws.amazon.com/codesuite/codepipeline/pipelines/" + data['detail']['pipeline'] + "/executions/" + data['detail']['execution-id'] + "?region="+region
 
             else:
               return()
 
-            encode_user_pass = b64encode(user_pass.encode()).decode()
-
             http = urllib3.PoolManager()
             r = http.request('POST', url,
-            headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'Curl/0.1', 'Authorization' : 'Basic %s' %  encode_user_pass},
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'Curl/0.1', 'Authorization' : 'token %s' %  ssm_client.get_parameter(Name=git_token_ssm_key, WithDecryption=True)['Parameter']['Value'] },
             body=json.dumps(build_status).encode('utf-8')
             )
 

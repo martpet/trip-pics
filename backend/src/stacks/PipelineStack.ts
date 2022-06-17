@@ -1,5 +1,4 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
 import { AppPipeline, AppPipelineProps } from '~/constructs';
@@ -18,22 +17,17 @@ export class PipelineStack extends Stack {
   ) {
     super(scope, id, props);
 
-    const gitUser = 'martpet';
-
-    deployments.forEach((options) => {
-      new AppPipeline(this, `app-pipeline-${options.envName}`, {
-        ...options,
-        repo: `${gitUser}/trip-pics`,
+    deployments.forEach((deploymentOptions) => {
+      new AppPipeline(this, `app-pipeline-${deploymentOptions.envName}`, {
+        ...deploymentOptions,
+        repo: 'martpet/trip-pics',
         nodejs: packageJson.engines.node,
         connectionArn:
           'arn:aws:codestar-connections:eu-central-1:791346621844:connection/5d269634-09ef-43bc-9a8f-d7529fb2d4ab',
-        buildStatusToGitParams: {
+        pipelineStatusGitIntegration: {
           IntegrationType: 'GitHub',
-          IntegrationUser: gitUser,
-          IntegrationPass: StringParameter.valueForStringParameter(
-            this,
-            'GITHUB_REST_STATUS_TOKEN'
-          ),
+          GitTokenSsmArn:
+            'arn:aws:ssm:eu-central-1:791346621844:parameter/codebuild/git-token',
         },
       });
     });

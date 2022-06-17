@@ -7,7 +7,7 @@ const appName = 'TripPics';
 const region = 'eu-central-1';
 
 new PipelineStack(app, 'pipeline', {
-  stackName: `${appName}-PipelineStack`,
+  stackName: `${appName}-Pipeline`,
   env: {
     account: '791346621844',
     region,
@@ -33,5 +33,5 @@ new PipelineStack(app, 'pipeline', {
 });
 
 new AppStack(app, 'dev', {
-  stackName: `${appName}-Dev-AppStack`,
+  stackName: `${appName}-Dev`,
 });

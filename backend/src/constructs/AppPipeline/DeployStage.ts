@@ -7,6 +7,6 @@ export class DeployStage extends Stage {
   constructor(scope: Construct, id: string, props?: StageProps) {
     super(scope, id, props);
 
-    new AppStack(this, 'AppStack');
+    new AppStack(this, 'App');
   }
 }
