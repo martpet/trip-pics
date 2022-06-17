@@ -3,7 +3,7 @@ import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
-import { AppPipelineStage } from '~/constructs/AppPipeline/AppPipelineStage';
+import { DeployStage } from '~/constructs';
 import { connectionArn, nodejs, sourceRepo } from '~/consts';
 
 export interface AppPipelineProps {
@@ -42,8 +42,8 @@ export class AppPipeline extends Construct {
       selfMutation: false,
     });
 
-    const stage = new AppPipelineStage(scope, `Deploy-${name}`, { env });
+    const deployStage = new DeployStage(scope, `Deploy-${name}`, { env });
 
-    pipeline.addStage(stage);
+    pipeline.addStage(deployStage);
   }
 }
