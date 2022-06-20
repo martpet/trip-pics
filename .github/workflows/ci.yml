@@ -23,8 +23,9 @@ jobs:
       - name: Test, check types & Lint
         run: npm test
 
-      - name: Synth CDK
-        run: npm run synth
-
       - name: Build frontend
         run: npm run build:frontend
+
+      - name: Synth CDK
+        run: npm run synth
+        
