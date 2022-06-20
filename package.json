@@ -19,7 +19,7 @@
     "build": "npm run build:frontend && npm run synth",
     "build:frontend": "vite build frontend",
     "synth": "cd backend && npx cdk synth",
-    "deploy": "cd backend && npx cdk deploy dev",
+    "deploy": "cd backend && npx cdk deploy app --require-approval never",
     "prepare": "husky install"
   },
   "dependencies": {
