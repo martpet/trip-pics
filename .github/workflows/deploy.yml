@@ -9,7 +9,7 @@ on:
 
 jobs:
   cdk:
-    name: AWS CDK
+    name: CDK
     runs-on: ubuntu-20.04
     steps:
       - name: Configure AWS Credentials
