@@ -1,3 +1,22 @@
+// This stack is not used.
+// Instead, deployment is done with GitHub workflows.
+
+// If you prefer to deploy with the PipelineStack, do this once:
+
+// 1. Remove deployment jobs from GitHub workflows.
+// 2. Add the follwing code to /app.ts:
+
+// new PipelineStack(app, 'pipeline', {
+//   stackName: `${appName}-Pipeline`,
+//   env: {
+//     account: '791346621844',
+//     region: appRegion,
+//   },
+// });
+
+// 3. Commit changes and push to "develop" and "main" branches.
+// 4. Run from /backend folder: "npx cdk deploy pipeline --profile trip-pics-pipelines"
+
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -39,6 +58,7 @@ export class PipelineStack extends Stack {
       pipelineStatusGitIntegration: {
         integrationType: 'GitHub',
         gitTokenSsmArn:
+          // Create a GitHub Personal access tokens with "repo:status" scope. Set an expiration date or it won't work.
           'arn:aws:ssm:eu-central-1:791346621844:parameter/codebuild/git-token',
       },
     });
