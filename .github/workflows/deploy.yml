@@ -1,4 +1,4 @@
-name: CI
+name: Deploy
 
 on:
   workflow_call:
@@ -9,6 +9,7 @@ on:
 
 jobs:
   cdk:
+    name: AWS CDK
     runs-on: ubuntu-20.04
     steps:
       - name: Configure AWS Credentials
