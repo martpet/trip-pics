@@ -25,7 +25,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: cdk deploy
+      - name: Build frontend
+        run: npm run build:frontend
+
+      - name: CDK deploy
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
