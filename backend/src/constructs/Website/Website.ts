@@ -5,12 +5,12 @@ import { Construct } from 'constructs';
 
 const path = require('path');
 
-interface FrontendWebsiteProps {
+interface WebsiteProps {
   distPath: string;
 }
 
-export class FrontendWebsite extends Construct {
-  constructor(scope: Construct, id: string, { distPath }: FrontendWebsiteProps) {
+export class Website extends Construct {
+  constructor(scope: Construct, id: string, { distPath }: WebsiteProps) {
     super(scope, id);
 
     const websiteBucket = new Bucket(this, 'WebsiteBucket', {
@@ -20,7 +20,7 @@ export class FrontendWebsite extends Construct {
       autoDeleteObjects: true,
     });
 
-    new BucketDeployment(this, 'DeployWebsite', {
+    new BucketDeployment(this, 'WebsiteDeployment', {
       sources: [Source.asset(path.join(__dirname, distPath))],
       destinationBucket: websiteBucket,
     });
