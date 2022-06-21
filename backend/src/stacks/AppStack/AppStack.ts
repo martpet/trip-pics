@@ -1,13 +1,13 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { FrontendWebsite } from '~/constructs';
+import { Website } from '~/constructs';
 
 export class AppStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    new FrontendWebsite(this, 'ReactApp', {
+    new Website(this, 'ReactApp', {
       distPath: '../../../../frontend/dist',
     });
   }
