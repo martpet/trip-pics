@@ -11,10 +11,10 @@
 
 (Admin permissions required)
 
-`npm run bootstrap -- --profile my-aws-profile` 
+`cd backend && npx cdk bootstrap --profile aws-profile` 
 ### Deploy changes
 (Admin permissions NOT required)
 
-`npm run deploy -- --profile my-aws-profile`
+`cd backend && npx cdk deploy --profile aws-profile`
 ### Change frontend env vars
 TODO
