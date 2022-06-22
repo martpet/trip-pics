@@ -1,3 +1,3 @@
-export * from './AppPipeline/AppPipeline';
+export * from './AppPipeline';
 export * from './PipelineStatusGitIntegration';
-export * from './Website/Website';
+export * from './Website';
