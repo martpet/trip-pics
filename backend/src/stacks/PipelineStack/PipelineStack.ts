@@ -2,7 +2,8 @@
 //
 // If you prefer to deploy with the PipelineStack, do this once:
 // 1. Remove staging.yml and production.yml GitHub workflows.
-// 2. Add the follwing to /app.ts:
+// 2.
+// 3. Add the follwing to /app.ts:
 //
 // new PipelineStack(app, 'pipeline', {
 //   stackName: `${appName}-Pipeline`,
@@ -12,14 +13,14 @@
 //   },
 // });
 //
-// 3. Commit changes and push to "develop" and "main" branches.
-// 4. Run from /backend folder: "npx cdk deploy pipeline --profile trip-pics-pipelines"
+// 4. Commit changes and push to "develop" and "main" branches.
+// 5. Run from /backend folder: "npx cdk deploy pipeline --profile trip-pics-pipelines"
 
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { AppPipeline } from '~/constructs';
-import { appName, appRegion } from '~/consts';
+import { appName, appRegion } from '~/consts/app';
 
 import packageJson from '../../../../package.json';
 import { DeploymentStage } from './DeploymentStage';
