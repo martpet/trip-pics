@@ -4,11 +4,12 @@ import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelin
 import { Construct } from 'constructs';
 
 import { PipelineStatusGitIntegration } from '~/constructs';
-import { appName } from '~/consts';
+import { appName } from '~/consts/app';
+import { EnvName } from '~/types';
 
 export interface AppPipelineProps {
   envs: Array<{
-    envName: string;
+    envName: EnvName;
     branch: string;
     env: Environment;
   }>;
@@ -70,7 +71,8 @@ export class AppPipeline extends Construct {
       pipeline.addStage(
         new DeploymentStage(scope, `${appName}-${envName}`, {
           env,
-        })
+          envName,
+        } as ConstructorParameters<typeof Stage>[2])
       );
 
       if (pipelineStatusGitIntegration) {

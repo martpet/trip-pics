@@ -3,7 +3,7 @@ name: Staging
 on:
   push:
     branches:
-      - develop
+      - staging
 
 jobs:
   ci:
@@ -16,4 +16,5 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       AWS_ROLE_ARN: arn:aws:iam::204115048155:role/OrganizationAccountAccessRole
+      STACK: StagingApp
     secrets: inherit

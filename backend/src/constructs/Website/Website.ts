@@ -4,8 +4,7 @@ import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-
-const path = require('path');
+import path from 'path';
 
 interface WebsiteProps {
   distPath: string;

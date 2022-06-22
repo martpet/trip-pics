@@ -6,6 +6,9 @@ on:
       AWS_ROLE_ARN:
         required: true
         type: string
+      STACK:
+        required: true
+        type: string
 
 jobs:
   cdk:
@@ -41,6 +44,6 @@ jobs:
         with:
           cdk_subcommand: 'deploy'
           working_dir: 'backend'
-          cdk_stack: 'app'
+          cdk_stack: ${{ inputs.STACK }}
           cdk_args: '--require-approval never'
           actions_comment: false
