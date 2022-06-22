@@ -1,9 +1,9 @@
 // This stack is not used. Instead, deployment is done with GitHub Workflows.
 //
-// If you prefer to deploy with the PipelineStack, do this once:
+// If you prefer to deploy with AWS CodePipeline, do this:
 // 1. Remove staging.yml and production.yml GitHub workflows.
-// 2.
-// 3. Add the follwing to /app.ts:
+// 2. Remove the Production and Staging stacks from app.ts, but keep a Development stack.
+// 3. Add the follwing to app.ts:
 //
 // new PipelineStack(app, 'pipeline', {
 //   stackName: `${appName}-Pipeline`,
@@ -14,7 +14,7 @@
 // });
 //
 // 4. Commit changes and push to "develop" and "main" branches.
-// 5. Run from /backend folder: "npx cdk deploy pipeline --profile trip-pics-pipelines"
+// 5. Run in "backend" folder: "npx cdk deploy pipeline --profile pipelines-aws-profile"
 
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
