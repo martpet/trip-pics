@@ -13,7 +13,7 @@
 //   },
 // });
 //
-// 4. Commit changes and push to "develop" and "main" branches.
+// 4. Commit changes and push to "staging" and "main" branches.
 // 5. Run in "backend" folder: "npx cdk deploy pipeline --profile pipelines-aws-profile"
 
 import { Stack, StackProps } from 'aws-cdk-lib';
@@ -41,7 +41,7 @@ export class PipelineStack extends Stack {
         },
         {
           envName: 'Staging',
-          branch: 'develop',
+          branch: 'staging',
           env: {
             account: '204115048155',
             region: appRegion,
