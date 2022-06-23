@@ -82,4 +82,4 @@ Create a hosted zone for the the app domain in the account of the Production env
   ```
 </details>
 
-##### 3. Pass the role ARN in *AppStack*.ts to *HostedZones* struct.
+##### 3. Pass the role ARN from *AppStack*.ts to the *HostedZones* struct.
