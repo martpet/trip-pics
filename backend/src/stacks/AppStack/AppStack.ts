@@ -2,7 +2,7 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { HostedZones, Website } from '~/constructs';
-import { appDomain, deployments } from '~/consts';
+import { appDomain, crossAccountZoneDelegationRoleArn } from '~/consts';
 import { EnvName } from '~/types';
 
 interface AppStackProps extends StackProps {
@@ -16,7 +16,7 @@ export class AppStack extends Stack {
     new HostedZones(this, 'HostedZones', {
       appDomain,
       isStaging: envName === 'Staging',
-      separateRootZoneAccount: deployments.Production.env.account,
+      delegationRoleArn: crossAccountZoneDelegationRoleArn,
     });
 
     new Website(this, 'ReactApp', {
