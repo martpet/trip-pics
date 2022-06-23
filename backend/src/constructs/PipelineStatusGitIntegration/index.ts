@@ -1,1 +1,1 @@
-export * from './PipelineStatusGitIntegration';
+export * from './CodeBuildStatusGitIntegration';

@@ -1,13 +1,20 @@
 import { App } from 'aws-cdk-lib';
 
-import { appName, envNames } from '~/consts';
+import { appName, deployments } from '~/consts';
 import { AppStack } from '~/stacks';
+import { EnvName } from '~/types';
 
 const app = new App();
 
-envNames.forEach((envName) => {
-  new AppStack(app, `${envName}App`, {
-    stackName: appName,
-    envName,
+Object.entries(deployments).forEach(([envName, { env }]) => {
+  new AppStack(app, envName, {
+    stackName: `${appName}${envName}`,
+    envName: envName as EnvName,
+    env,
   });
+});
+
+new AppStack(app, 'personal', {
+  stackName: appName,
+  envName: 'Personal',
 });
