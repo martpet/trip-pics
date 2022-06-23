@@ -3,27 +3,28 @@ import { Environment } from 'aws-cdk-lib';
 import { appRegion } from '~/consts';
 import { EnvName } from '~/types';
 
-type DeploymentOptions = Record<
-  Exclude<EnvName, 'Personal'>,
-  {
-    gitBranch: string;
-    env: Required<Environment>;
-  }
->;
+type DeploymentEnvName = Exclude<EnvName, 'Personal'>;
 
-export const deployments: DeploymentOptions = {
-  Production: {
+type DeploymentOptions = {
+  gitBranch: string;
+  env: Required<Environment>;
+};
+
+const region = appRegion;
+
+export const deployments: Record<DeploymentEnvName, DeploymentOptions> = {
+  Staging: {
     gitBranch: 'main',
     env: {
-      account: '766373560006',
-      region: appRegion,
+      account: '204115048155',
+      region,
     },
   },
-  Staging: {
-    gitBranch: 'staging',
+  Production: {
+    gitBranch: 'prod',
     env: {
-      account: '204115048155',
-      region: appRegion,
+      account: '766373560006',
+      region,
     },
   },
 };
