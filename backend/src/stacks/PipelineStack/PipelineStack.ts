@@ -1,9 +1,9 @@
-// This stack is not used. Instead, deployment is done with GitHub Workflows.
-//
-// If you prefer to deploy with AWS CodePipeline, do this:
-// 1. Remove staging.yml and production.yml GitHub workflows.
-// 2. Remove the Production and Staging stacks from app.ts, but keep a Development stack.
-// 3. Add the follwing to app.ts:
+// This stack is not used anymore - deployment is now done with GitHub Workflows.
+// If you want to use this stack instead:
+
+// 1. Remove staging.yml and production.yml from GitHub workflows.
+// 2. Remove the Production and Staging stacks from app.ts.
+// 3. Add in app.ts:
 //
 // new PipelineStack(app, 'pipeline', {
 //   stackName: `${appName}-Pipeline`,
@@ -13,14 +13,14 @@
 //   },
 // });
 //
-// 4. Commit changes and push to "staging" and "main" branches.
-// 5. Run in "backend" folder: "npx cdk deploy pipeline --profile pipelines-aws-profile"
+// 4. Push changes to "staging" and "main" branches.
+// 5. Deploy pipeline mannualy only once with: "npx cdk deploy pipeline --profile pipelines-aws-profile"
 
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { AppPipeline } from '~/constructs';
-import { appName, appRegion } from '~/consts/app';
+import { AppPipeline, CodeBuildStatusGitIntegration } from '~/constructs';
+import { appName, deployments, gitRepo } from '~/consts';
 
 import packageJson from '../../../../package.json';
 import { DeploymentStage } from './DeploymentStage';
@@ -29,37 +29,32 @@ export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
 
-    new AppPipeline(this, `AppPipeline`, {
-      envs: [
-        {
-          envName: 'Production',
-          branch: 'main',
-          env: {
-            account: '766373560006',
-            region: appRegion,
-          },
-        },
-        {
-          envName: 'Staging',
-          branch: 'staging',
-          env: {
-            account: '204115048155',
-            region: appRegion,
-          },
-        },
-      ],
-      repo: 'martpet/trip-pics',
-      DeploymentStage,
-      appName,
-      connectionArn:
-        'arn:aws:codestar-connections:eu-central-1:791346621844:connection/5d269634-09ef-43bc-9a8f-d7529fb2d4ab',
-      nodejs: packageJson.engines.node,
-      pipelineStatusGitIntegration: {
+    // Create a connection in CodeStar to GitHub.
+    const connectionArn =
+      'arn:aws:codestar-connections:eu-central-1:791346621844:connection/5d269634-09ef-43bc-9a8f-d7529fb2d4ab';
+
+    // Create a Personal Access Tokens in GitHub with scope "repo:status" with any expiration date.
+    const gitTokenSsmArn =
+      'arn:aws:ssm:eu-central-1:791346621844:parameter/codebuild/git-token';
+
+    Object.entries(deployments).forEach(([envName, { env, gitBranch }]) => {
+      const { pipelineName } = new AppPipeline(this, `AppPipeline`, {
+        envName,
+        env,
+        gitBranch,
+        DeploymentStage,
+        appName,
+        nodejs: packageJson.engines.node,
+        repo: gitRepo,
+        connectionArn,
+      });
+
+      // Post CodeBuild status to GitHub repo
+      new CodeBuildStatusGitIntegration(this, `CodeBuildStatusToGit-${pipelineName}`, {
+        pipelineName,
         integrationType: 'GitHub',
-        gitTokenSsmArn:
-          // Create a GitHub Personal access tokens with "repo:status" scope. Set an expiration date or it won't work.
-          'arn:aws:ssm:eu-central-1:791346621844:parameter/codebuild/git-token',
-      },
+        gitTokenSsmArn,
+      });
     });
   }
 }
