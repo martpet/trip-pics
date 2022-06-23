@@ -1,1 +1,1 @@
-export const envNames = ['Production', 'Staging', 'Development'] as const;
+export const envNames = ['Production', 'Staging', 'Personal'] as const;
