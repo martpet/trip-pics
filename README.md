@@ -6,20 +6,31 @@
 ## Start frontend
 `npm start`
 
-## Git workflow
-Pushes to `main` trigger a deploy to Staging. Pushes to `prod` depoloy to Production.
+## Deploying
+Git push to `main` triggers a deploy to Staging. Pushing to `prod` depoloys to Production.
 
 ----
 
 ## Setup a personal AWS environment
 
+### Create a personal account in the AWS Organization
+
+Ask the administrator to create a new account for you.
+
+### Choose a personal subdomain
+
+Should be unique among other subdomains in the app.
+
+* Create a `.env.local` file in the repo root folder.
+* Add a `PERSONAL_ENV_SUBDOMAIN` env variable.
+
 ### Bootstrap
 
-`cd backend && npx bootstrap --profile <aws-profile>`
+`cd backend && npx cdk bootstrap <account id>/<region> --profile <personal-account-aws-profile>`
 
 ### Deploy
 
-`cd backend && npx cdk deploy personal --profile <aws-profile>`
+`cd backend && npx cdk deploy Personal --profile <personal-account-aws-profile>`
 
 ----
 
@@ -33,7 +44,9 @@ For each deployment environment run (needs admin rights):
 `cd backend && npx bootstrap --profile <aws-profile-for-the-account>`
 
 ### 2. Add an AWS hosted zone
-Create a hosted zone for the the app domain in the account of the Production environment.
+* Create a hosted zone in the account of the Production environment. Name it after the app domain.
+* Add the hosted zone id as `rootHostedZoneId` in `consts/app.ts`.
+* TODO: health checks
 
 #### If separate AWS accounts are used for each enviroment:
 
@@ -49,7 +62,7 @@ Create a hosted zone for the the app domain in the account of the Production env
         {
             "Effect": "Allow",
             "Action": "route53:ChangeResourceRecordSets",
-            "Resource": "arn:aws:route53:::hostedzone/Z025668263BPB5OKFH9E"
+            "Resource": "arn:aws:route53:::hostedzone/####"
         },
         {
             "Effect": "Allow",
@@ -61,7 +74,7 @@ Create a hosted zone for the the app domain in the account of the Production env
   ```
 </details>
 
-**2.2. Create a role, attach the above policy to it, and add the following trust policy to the role:**
+**2.2. Create a role, attach the above policy to it, add the following trust policy to the role:**
 
 <details>
   <summary>Trust policy</summary>
@@ -87,16 +100,9 @@ Create a hosted zone for the the app domain in the account of the Production env
   ```
 </details>
 
-
+**2.3. ** Set the role ARN as `zoneDelegationRole` variable in `const/app.ts`
 
 ### 3. Add a domain
 
-Add a domain name for the hosted zone from step 2, in the account of the Production environment.
-
-### 4. Add SSL certificate.
-
-* Create a public certificate in **us-east-1 region** (requirement) of the Production environment account,
-* add domains *domain.name* and **.domain.name* ,
-* use the hosted zone from step 2,
-* choose DNS validation,
-* assign the certificate ARN to a variable named *certificateArn* in *consts/app.ts*.**.
+* Add a domain name for the hosted zone from step 2, in the account of the Production environment.
+* Add the domain name as `rootDomain` in `consts/app.ts`

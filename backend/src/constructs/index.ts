@@ -1,4 +1,4 @@
 export * from './AppPipeline';
-export * from './HostedZones';
+export * from './Domains';
 export * from './PipelineStatusGitIntegration';
 export * from './Website';

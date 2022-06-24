@@ -1,9 +1,11 @@
-// This stack is not used anymore - deployment is now done with GitHub Workflows.
-// If you want to use this stack instead:
+// Deployment with AWS CodePipeline is not recommended.
+// Instead, GitHub Workflows are used.
+
+// If you want to deploy with AWS CodePipeline:
 
 // 1. Remove staging.yml and production.yml from GitHub workflows.
-// 2. Remove the Production and Staging stacks from app.ts.
-// 3. Add in app.ts:
+// 2. Remove Production and Staging stacks from app.ts.
+// 3. In app.ts add:
 //
 // new PipelineStack(app, 'pipeline', {
 //   stackName: `${appName}-Pipeline`,
@@ -13,14 +15,15 @@
 //   },
 // });
 //
-// 4. Push changes to "staging" and "main" branches.
-// 5. Deploy pipeline mannualy only once with: "npx cdk deploy pipeline --profile pipelines-aws-profile"
+// 4. Push changes to "main" and "prod" branches.
+// 5. Deploy pipeline stack: "npx cdk deploy pipeline --profile aws-profile"
 
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { AppPipeline, CodeBuildStatusGitIntegration } from '~/constructs';
-import { appName, deployments, gitRepo } from '~/consts';
+import { appEnvs, appName, gitRepo } from '~/consts';
+import { EnvName } from '~/types';
 
 import packageJson from '../../../../package.json';
 import { DeploymentStage } from './DeploymentStage';
@@ -37,11 +40,17 @@ export class PipelineStack extends Stack {
     const gitTokenSsmArn =
       'arn:aws:ssm:eu-central-1:791346621844:parameter/codebuild/git-token';
 
-    Object.entries(deployments).forEach(([envName, { env, gitBranch }]) => {
+    const pipelineEnvNames: EnvName[] = ['Production', 'Staging'];
+
+    const pipelineEnvs = Object.entries(appEnvs).filter(([envName]) =>
+      pipelineEnvNames.includes(envName as EnvName)
+    );
+
+    pipelineEnvs.forEach(([envName, { env, gitBranch }]) => {
       const { pipelineName } = new AppPipeline(this, `AppPipeline`, {
         envName,
-        env,
-        gitBranch,
+        env: env!,
+        gitBranch: gitBranch!,
         DeploymentStage,
         appName,
         nodejs: packageJson.engines.node,
@@ -49,7 +58,7 @@ export class PipelineStack extends Stack {
         connectionArn,
       });
 
-      // Post CodeBuild status to GitHub repo
+      // Send CodeBuild status to GitHub
       new CodeBuildStatusGitIntegration(this, `CodeBuildStatusToGit-${pipelineName}`, {
         pipelineName,
         integrationType: 'GitHub',

@@ -5,6 +5,7 @@ import pluginRewriteAll from 'vite-plugin-rewrite-all';
 import svgrPlugin from 'vite-plugin-svgr';
 
 export default defineConfig({
+  envDir: '../',
   plugins: [react(), svgrPlugin(), pluginRewriteAll()],
   resolve: {
     alias: [{ find: '~', replacement: resolve(__dirname, 'src') }],
