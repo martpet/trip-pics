@@ -6,9 +6,12 @@
 ## Start frontend
 `npm start`
 
+## Git workflow
+Pushes to `main` trigger a deploy to Staging. Pushes to `prod` depoloy to Production.
+
 ----
 
-## Setup a personal deployment environment
+## Setup a personal AWS environment
 
 ### Bootstrap
 
