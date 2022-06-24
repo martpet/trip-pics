@@ -18,6 +18,8 @@
 
 `cd backend && npx cdk deploy personal --profile <aws-profile>`
 
+----
+
 ## Setup Production and Staging environments
 
 ### 1. Bootstrap
@@ -32,7 +34,7 @@ Create a hosted zone for the the app domain in the account of the Production env
 
 #### If separate AWS accounts are used for each enviroment:
 
-##### 1. Create a policy in the Production account:
+**2.1. Create a policy in the Production account:**
 
 <details>
   <summary>Route53ChangeRootZoneRecordSets</summary>
@@ -56,7 +58,7 @@ Create a hosted zone for the the app domain in the account of the Production env
   ```
 </details>
 
-##### 2. Create a role, attach the above policy to it, and add the following trust policy to the role:
+**2.2. Create a role, attach the above policy to it, and add the following trust policy to the role:**
 
 <details>
   <summary>Trust policy</summary>
@@ -82,4 +84,16 @@ Create a hosted zone for the the app domain in the account of the Production env
   ```
 </details>
 
-##### 3. Pass the role ARN from *AppStack*.ts to the *HostedZones* struct.
+
+
+### 3. Add a domain
+
+Add a domain name for the hosted zone from step 2, in the account of the Production environment.
+
+### 4. Add SSL certificate.
+
+* Create a public certificate in **us-east-1 region** (requirement) of the Production environment account,
+* add domains *domain.name* and **.domain.name* ,
+* use the hosted zone from step 2,
+* choose DNS validation,
+* assign the certificate ARN to a variable named *certificateArn* in *consts/app.ts*.**.

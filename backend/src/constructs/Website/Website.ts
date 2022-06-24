@@ -1,4 +1,5 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
+import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { Distribution } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -8,10 +9,16 @@ import path from 'path';
 
 interface WebsiteProps {
   distPath: string;
+  domainName: string;
+  certificateArn: string;
 }
 
 export class Website extends Construct {
-  constructor(scope: Construct, id: string, { distPath }: WebsiteProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    { distPath, domainName, certificateArn }: WebsiteProps
+  ) {
     super(scope, id);
 
     const destinationBucket = new Bucket(this, 'WebsiteBucket', {
@@ -20,8 +27,16 @@ export class Website extends Construct {
       autoDeleteObjects: true,
     });
 
+    const certificate = Certificate.fromCertificateArn(
+      this,
+      'DomainCert',
+      certificateArn
+    );
+
     const distribution = new Distribution(this, 'Distribution', {
       defaultBehavior: { origin: new S3Origin(destinationBucket) },
+      domainNames: [domainName],
+      certificate,
     });
 
     new BucketDeployment(this, 'WebsiteDeployment', {

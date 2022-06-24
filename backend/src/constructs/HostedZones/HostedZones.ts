@@ -10,27 +10,34 @@ import { Construct } from 'constructs';
 interface HostedZonesProps {
   appDomain: string;
   isStaging: boolean;
-  delegationRoleArn?: string;
+  crossAccountZoneDelegationRoleArn?: string;
 }
 
 export class HostedZones extends Construct {
+  readonly websiteDomain: string;
+
   constructor(
     scope: Construct,
     id: string,
-    { appDomain, delegationRoleArn, isStaging }: HostedZonesProps
+    { appDomain, crossAccountZoneDelegationRoleArn, isStaging }: HostedZonesProps
   ) {
     super(scope, id);
+    this.websiteDomain = appDomain;
 
     if (isStaging) {
-      const staginZone = new PublicHostedZone(this, 'StagingZone', {
-        zoneName: `staging.${appDomain}`,
-      });
+      const zoneName = `staging.${appDomain}`;
+      const staginZone = new PublicHostedZone(this, 'StagingZone', { zoneName });
+      this.websiteDomain = zoneName;
 
-      if (delegationRoleArn) {
+      if (crossAccountZoneDelegationRoleArn) {
         new CrossAccountZoneDelegationRecord(this, 'DelegateStagingZone', {
           parentHostedZoneName: appDomain,
           delegatedZone: staginZone,
-          delegationRole: Role.fromRoleArn(this, 'DelegationRole', delegationRoleArn),
+          delegationRole: Role.fromRoleArn(
+            this,
+            'DelegationRole',
+            crossAccountZoneDelegationRoleArn
+          ),
         });
       }
     }
