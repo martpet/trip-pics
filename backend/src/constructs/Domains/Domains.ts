@@ -4,7 +4,6 @@ import {
   ICertificate,
 } from 'aws-cdk-lib/aws-certificatemanager';
 import { Role } from 'aws-cdk-lib/aws-iam';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import {
   CrossAccountZoneDelegationRecord,
   IHostedZone,
@@ -50,12 +49,9 @@ export class Domains extends Construct {
         zoneName: rootDomain,
       });
     } else {
-      const logGroup = new LogGroup(this, 'Log Group');
       hostedZone = new PublicHostedZone(this, 'HostedZone', {
         zoneName: `${envSubDomain}.${rootDomain}`,
-        queryLogsLogGroupArn: logGroup.logGroupArn,
       });
-      // TODO: health checks
     }
 
     if (!isProd && zoneDelegationRole) {
