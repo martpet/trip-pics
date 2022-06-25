@@ -11,8 +11,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        {import.meta.env.VITE_FOO}
-        <p>Hello Vite + React!1</p>
+        <p>Hello Vite + React</p>
         <p>
           <button type="button" onClick={() => setCount((state) => state + 1)}>
             count is: {count}

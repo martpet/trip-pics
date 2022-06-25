@@ -1,8 +1,8 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { HostedZones, Website } from '~/constructs';
-import { appDomain, crossAccountZoneDelegationRoleArn } from '~/consts';
+import { Domains, Website } from '~/constructs';
+import { appEnvs, rootDomain, rootHostedZoneId, zoneDelegationRole } from '~/consts';
 import { EnvName } from '~/types';
 
 interface AppStackProps extends StackProps {
@@ -13,14 +13,18 @@ export class AppStack extends Stack {
   constructor(scope: Construct, id: string, { envName, ...props }: AppStackProps) {
     super(scope, id, props);
 
-    new HostedZones(this, 'HostedZones', {
-      appDomain,
-      isStaging: envName === 'Staging',
-      delegationRoleArn: crossAccountZoneDelegationRoleArn,
+    const { appDomain, appDomainCertificate } = new Domains(this, 'Domains', {
+      isProd: envName === 'Production',
+      rootDomain,
+      rootHostedZoneId,
+      envSubDomain: appEnvs[envName].subDomain,
+      zoneDelegationRole,
     });
 
     new Website(this, 'ReactApp', {
       distPath: '../../../../frontend/dist',
+      domainName: appDomain,
+      certificate: appDomainCertificate,
     });
   }
 }
