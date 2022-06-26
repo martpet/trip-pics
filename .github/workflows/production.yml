@@ -1,6 +1,6 @@
 name: 🚀 Deploy Production
 
-on: workflow_run
+on: workflow_dispatch
 
 jobs:
   ci:
