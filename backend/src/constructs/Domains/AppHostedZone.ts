@@ -1,6 +1,7 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { Role } from 'aws-cdk-lib/aws-iam';
 import {
+  CfnHealthCheck,
   CrossAccountZoneDelegationRecord,
   IHostedZone,
   PublicHostedZone,
@@ -31,21 +32,23 @@ export class AppHostedZone extends Construct {
   ) {
     super(scope, id);
 
-    let hostedZone: IHostedZone;
+    if (!isProd && !subDomain) {
+      throw new Error('Subdomain is required');
+    }
+
+    let zone: IHostedZone;
 
     if (isProd) {
-      hostedZone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
+      zone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
         hostedZoneId: rootHostedZoneId,
         zoneName: rootDomain,
       });
     } else {
-      if (!subDomain) {
-        throw new Error('Subdomain is required');
-      }
-
-      hostedZone = new PublicHostedZone(this, 'HostedZone', {
+      zone = new PublicHostedZone(this, 'HostedZone', {
         zoneName: `${subDomain}.${rootDomain}`,
       });
+
+      zone.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
       if (zoneDelegationRole) {
         const delegationRole = Role.fromRoleArn(
@@ -55,15 +58,20 @@ export class AppHostedZone extends Construct {
         );
         new CrossAccountZoneDelegationRecord(this, 'ZoneDelegation', {
           parentHostedZoneName: rootDomain,
-          delegatedZone: hostedZone,
+          delegatedZone: zone,
           delegationRole,
           removalPolicy: RemovalPolicy.DESTROY,
         });
       }
-
-      hostedZone.applyRemovalPolicy(RemovalPolicy.DESTROY);
     }
 
-    this.hostedZone = hostedZone;
+    new CfnHealthCheck(this, 'HealthCheck', {
+      healthCheckConfig: {
+        type: 'HTTPS',
+        fullyQualifiedDomainName: zone.zoneName,
+      },
+    });
+
+    this.hostedZone = zone;
   }
 }
