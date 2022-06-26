@@ -2,7 +2,7 @@ import { Environment } from 'aws-cdk-lib';
 
 import { appRegion } from '~/consts';
 import { EnvName } from '~/types';
-import { getOrGeneratePersonalSubdomainName } from '~/utils';
+import { getOrGeneratesubdomainName } from '~/utils';
 
 export interface AppEnv {
   gitBranch?: string;
@@ -21,14 +21,14 @@ export const appEnvs: Record<EnvName, AppEnv> = {
 
   Staging: {
     gitBranch: 'main',
+    subDomain: 'test',
     env: {
       account: '204115048155',
       region: appRegion,
     },
-    subDomain: 'staging',
   },
 
   Personal: {
-    subDomain: getOrGeneratePersonalSubdomainName(),
+    subDomain: getOrGeneratesubdomainName(),
   },
 };
