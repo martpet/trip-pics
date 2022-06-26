@@ -6,12 +6,9 @@ import { EnvName } from '~/types';
 
 const app = new App();
 
-const stacks = Object.entries(appEnvs) as Array<[EnvName, AppEnv]>;
+const envs = Object.entries(appEnvs) as Array<[EnvName, AppEnv]>;
 
-stacks.forEach(([envName, { env, subDomain }]) => {
-  if (envName === 'Personal' && !subDomain) {
-    return;
-  }
+envs.forEach(([envName, { env }]) => {
   new AppStack(app, envName, {
     stackName: `${appName}${envName}`,
     envName,

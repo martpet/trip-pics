@@ -1,3 +1,4 @@
+import { resolve } from 'app-root-path';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -13,16 +14,19 @@ export class AppStack extends Stack {
   constructor(scope: Construct, id: string, { envName, ...props }: AppStackProps) {
     super(scope, id, props);
 
+    const isProd = envName === 'Production';
+    const { subDomain } = appEnvs[envName];
+
     const { hostedZone, certificate } = new Domains(this, 'Domains', {
-      isProd: envName === 'Production',
+      isProd,
       rootDomain,
-      envSubDomain: appEnvs[envName].subDomain,
+      subDomain,
       rootHostedZoneId,
       zoneDelegationRole,
     });
 
     new StaticSite(this, 'ReactApp', {
-      distPath: '../../../../frontend/dist',
+      distPath: resolve('frontend/dist'),
       hostedZone,
       certificate,
     });

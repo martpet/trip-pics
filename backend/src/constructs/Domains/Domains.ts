@@ -1,3 +1,5 @@
+// TODO Add Route53 Health checks
+
 import { RemovalPolicy } from 'aws-cdk-lib';
 import {
   DnsValidatedCertificate,
@@ -15,7 +17,7 @@ interface DomainsProps {
   isProd: boolean;
   rootDomain: string;
   rootHostedZoneId: string;
-  envSubDomain?: string;
+  subDomain?: string;
   zoneDelegationRole?: string;
 }
 
@@ -27,17 +29,11 @@ export class Domains extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    {
-      isProd,
-      rootDomain,
-      rootHostedZoneId,
-      envSubDomain,
-      zoneDelegationRole,
-    }: DomainsProps
+    { isProd, rootDomain, rootHostedZoneId, subDomain, zoneDelegationRole }: DomainsProps
   ) {
     super(scope, id);
 
-    if (!isProd && !envSubDomain) {
+    if (!isProd && !subDomain) {
       throw new Error('Subdomain is required');
     }
 
@@ -50,7 +46,7 @@ export class Domains extends Construct {
       });
     } else {
       hostedZone = new PublicHostedZone(this, 'HostedZone', {
-        zoneName: `${envSubDomain}.${rootDomain}`,
+        zoneName: `${subDomain}.${rootDomain}`,
       });
     }
 

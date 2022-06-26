@@ -2,6 +2,7 @@ import { Environment } from 'aws-cdk-lib';
 
 import { appRegion } from '~/consts';
 import { EnvName } from '~/types';
+import { getOrGeneratePersonalSubdomainName } from '~/utils';
 
 export interface AppEnv {
   gitBranch?: string;
@@ -28,6 +29,6 @@ export const appEnvs: Record<EnvName, AppEnv> = {
   },
 
   Personal: {
-    subDomain: process.env.PERSONAL_ENV_SUBDOMAIN,
+    subDomain: getOrGeneratePersonalSubdomainName(),
   },
 };

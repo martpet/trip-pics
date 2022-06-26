@@ -22,7 +22,7 @@ Ask the administrator to create a new account for you.
 Should be unique among other subdomains in the app.
 
 * Create a `.env.local` file in the repo root folder.
-* Add a `PERSONAL_ENV_SUBDOMAIN` env variable.
+* Add a `PERSONAL_SUBDOMAIN` env variable.
 
 ### Bootstrap
 

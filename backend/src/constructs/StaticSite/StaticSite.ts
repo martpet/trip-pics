@@ -7,7 +7,6 @@ import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-import path from 'path';
 
 interface StaticSiteProps {
   distPath: string;
@@ -50,7 +49,7 @@ export class StaticSite extends Construct {
     });
 
     new BucketDeployment(this, 'Deployment', {
-      sources: [Source.asset(path.join(__dirname, distPath))],
+      sources: [Source.asset(distPath)],
       destinationBucket,
       distribution,
     });
