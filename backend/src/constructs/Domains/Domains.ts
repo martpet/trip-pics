@@ -20,9 +20,9 @@ interface DomainsProps {
 }
 
 export class Domains extends Construct {
-  readonly appDomain: string;
+  readonly hostedZone: IHostedZone;
 
-  readonly appDomainCertificate: ICertificate;
+  readonly certificate: ICertificate;
 
   constructor(
     scope: Construct,
@@ -54,7 +54,14 @@ export class Domains extends Construct {
       });
     }
 
-    if (!isProd && zoneDelegationRole) {
+    const certificate = new DnsValidatedCertificate(this, 'Certificate', {
+      domainName: hostedZone.zoneName,
+      hostedZone,
+      region: 'us-east-1',
+      cleanupRoute53Records: true,
+    });
+
+    if (zoneDelegationRole && !isProd) {
       new CrossAccountZoneDelegationRecord(this, 'ZoneDelegation', {
         parentHostedZoneName: rootDomain,
         delegatedZone: hostedZone,
@@ -63,15 +70,7 @@ export class Domains extends Construct {
       });
     }
 
-    const certificate = new DnsValidatedCertificate(this, 'Certificate', {
-      domainName: hostedZone.zoneName,
-      hostedZone,
-      region: 'us-east-1',
-      cleanupRoute53Records: true,
-    });
-
-    this.appDomain = hostedZone.zoneName;
-
-    this.appDomainCertificate = certificate;
+    this.hostedZone = hostedZone;
+    this.certificate = certificate;
   }
 }
