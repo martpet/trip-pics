@@ -41,6 +41,7 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
+          cdk_version: '2.29.0'
           working_dir: 'backend'
           cdk_stack: ${{ inputs.STACK }}
           cdk_args: '--require-approval never'
