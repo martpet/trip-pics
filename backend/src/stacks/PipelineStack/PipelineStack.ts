@@ -12,7 +12,7 @@
 //   stackName: `${appName}-Pipeline`,
 //   env: {
 //     account: '791346621844',
-//     region: appRegion,
+//     region,
 //   },
 // });
 //

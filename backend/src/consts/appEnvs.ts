@@ -1,6 +1,6 @@
 import { Environment } from 'aws-cdk-lib';
 
-import { appRegion } from '~/consts';
+import { region } from '~/consts';
 import { EnvName } from '~/types';
 import { getOrGenerateSubdomainName } from '~/utils';
 
@@ -18,7 +18,7 @@ export const appEnvs: AppEnvWithAWSEnv[] = [
     envName: 'Production',
     env: {
       account: '766373560006',
-      region: appRegion,
+      region,
     },
   },
   {
@@ -26,7 +26,7 @@ export const appEnvs: AppEnvWithAWSEnv[] = [
     subDomain: 'test',
     env: {
       account: '204115048155',
-      region: appRegion,
+      region,
     },
   },
   {
