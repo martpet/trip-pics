@@ -1,6 +1,6 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { Distribution } from 'aws-cdk-lib/aws-cloudfront';
+import { Distribution, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
@@ -28,7 +28,10 @@ export class StaticSite extends Construct {
     });
 
     const distribution = new Distribution(this, 'Distribution', {
-      defaultBehavior: { origin: new S3Origin(destinationBucket) },
+      defaultBehavior: {
+        origin: new S3Origin(destinationBucket),
+        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      },
       domainNames: [hostedZone.zoneName],
       defaultRootObject: 'index.html',
       errorResponses: [
