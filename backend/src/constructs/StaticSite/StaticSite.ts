@@ -7,17 +7,17 @@ import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import path from 'path';
 
-interface WebsiteProps {
+interface StaticSiteProps {
   distPath: string;
   domainName: string;
   certificate: ICertificate;
 }
 
-export class Website extends Construct {
+export class StaticSite extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { distPath, domainName, certificate }: WebsiteProps
+    { distPath, domainName, certificate }: StaticSiteProps
   ) {
     super(scope, id);
 

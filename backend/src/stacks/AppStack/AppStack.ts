@@ -1,7 +1,7 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { Domains, Website } from '~/constructs';
+import { Domains, StaticSite } from '~/constructs';
 import { appEnvs, rootDomain, rootHostedZoneId, zoneDelegationRole } from '~/consts';
 import { EnvName } from '~/types';
 
@@ -21,7 +21,7 @@ export class AppStack extends Stack {
       zoneDelegationRole,
     });
 
-    new Website(this, 'ReactApp', {
+    new StaticSite(this, 'ReactApp', {
       distPath: '../../../../frontend/dist',
       domainName: appDomain,
       certificate: appDomainCertificate,
