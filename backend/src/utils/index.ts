@@ -1,1 +1,1 @@
-export * from './getOrGeneratesubdomainName';
+export * from './getOrGenerateSubdomainName';

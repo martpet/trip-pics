@@ -2,7 +2,7 @@ import { Environment } from 'aws-cdk-lib';
 
 import { appRegion } from '~/consts';
 import { EnvName } from '~/types';
-import { getOrGeneratesubdomainName } from '~/utils';
+import { getOrGenerateSubdomainName } from '~/utils';
 
 export interface AppEnv {
   subDomain?: string;
@@ -26,6 +26,6 @@ export const appEnvs: Record<EnvName, AppEnv> = {
   },
 
   Personal: {
-    subDomain: getOrGeneratesubdomainName(),
+    subDomain: getOrGenerateSubdomainName(),
   },
 };
