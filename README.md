@@ -27,7 +27,7 @@ Should be unique among other subdomains in the app.
 
 ### Deploy
 
-`cd backend && npx cdk deploy Personal --profile <personal-account-aws-profile>`
+`npm run deploy -- --profile <personal-account-aws-profile>`
 
 ----
 
