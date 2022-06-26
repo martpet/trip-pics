@@ -1,3 +1,3 @@
-export * from './app';
+export * from './appConsts';
 export * from './appEnvs';
 export * from './envNames';
