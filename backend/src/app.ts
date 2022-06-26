@@ -1,17 +1,15 @@
 import { App } from 'aws-cdk-lib';
 
-import { AppEnv, appEnvs, appName } from '~/consts';
+import { appEnvs, appName } from '~/consts';
 import { AppStack } from '~/stacks';
-import { EnvName } from '~/types';
 
 const app = new App();
 
-const envs = Object.entries(appEnvs) as Array<[EnvName, AppEnv]>;
-
-envs.forEach(([envName, { env }]) => {
+appEnvs.forEach(({ env, ...appEnv }) => {
+  const { envName } = appEnv;
   new AppStack(app, envName, {
     stackName: `${appName}${envName}`,
-    envName,
     env,
+    appEnv,
   });
 });

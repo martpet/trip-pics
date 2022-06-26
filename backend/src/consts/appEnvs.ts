@@ -5,27 +5,32 @@ import { EnvName } from '~/types';
 import { getOrGenerateSubdomainName } from '~/utils';
 
 export interface AppEnv {
+  envName: EnvName;
   subDomain?: string;
+}
+
+export interface AppEnvWithAWSEnv extends AppEnv {
   env?: Environment;
 }
 
-export const appEnvs: Record<EnvName, AppEnv> = {
-  Production: {
+export const appEnvs: AppEnvWithAWSEnv[] = [
+  {
+    envName: 'Production',
     env: {
       account: '766373560006',
       region: appRegion,
     },
   },
-
-  Staging: {
+  {
+    envName: 'Staging',
     subDomain: 'test',
     env: {
       account: '204115048155',
       region: appRegion,
     },
   },
-
-  Personal: {
+  {
+    envName: 'Personal',
     subDomain: getOrGenerateSubdomainName(),
   },
-};
+];
