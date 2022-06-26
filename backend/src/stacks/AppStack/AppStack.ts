@@ -16,8 +16,8 @@ export class AppStack extends Stack {
     const { hostedZone, certificate } = new Domains(this, 'Domains', {
       isProd: envName === 'Production',
       rootDomain,
-      rootHostedZoneId,
       envSubDomain: appEnvs[envName].subDomain,
+      rootHostedZoneId,
       zoneDelegationRole,
     });
 
