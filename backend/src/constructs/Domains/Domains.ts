@@ -48,6 +48,7 @@ export class Domains extends Construct {
       hostedZone = new PublicHostedZone(this, 'HostedZone', {
         zoneName: `${subDomain}.${rootDomain}`,
       });
+      hostedZone.applyRemovalPolicy(RemovalPolicy.DESTROY);
     }
 
     const certificate = new DnsValidatedCertificate(this, 'Certificate', {
