@@ -6,9 +6,6 @@
 ## Start frontend
 `npm start`
 
-## Deploying
-Git push to `main` triggers a deploy to Staging. Pushing to `prod` depoloys to Production.
-
 ----
 
 ## Setup a personal AWS environment

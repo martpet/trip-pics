@@ -1,15 +1,8 @@
 name: Production
 
-on:
-  push:
-    branches:
-      - prod
+on: workflow_dispatch
 
-jobs:
-  ci:
-    name: CI
-    uses: ./.github/workflows/ci.yml
-    
+jobs:    
   deploy:
     name: Deploy
     needs: ci
