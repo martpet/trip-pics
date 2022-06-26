@@ -13,7 +13,7 @@ export class AppStack extends Stack {
   constructor(scope: Construct, id: string, { envName, ...props }: AppStackProps) {
     super(scope, id, props);
 
-    const { appDomain, appDomainCertificate } = new Domains(this, 'Domains', {
+    const { hostedZone, certificate } = new Domains(this, 'Domains', {
       isProd: envName === 'Production',
       rootDomain,
       rootHostedZoneId,
@@ -23,8 +23,8 @@ export class AppStack extends Stack {
 
     new StaticSite(this, 'ReactApp', {
       distPath: '../../../../frontend/dist',
-      domainName: appDomain,
-      certificate: appDomainCertificate,
+      hostedZone,
+      certificate,
     });
   }
 }
