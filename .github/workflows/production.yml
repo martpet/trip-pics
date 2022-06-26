@@ -1,9 +1,6 @@
-name: Deploy Production
+name: 🚀 Deploy Production
 
-on:
-  push:
-    branches:
-      - prod
+on: workflow_run
 
 jobs:
   ci:
