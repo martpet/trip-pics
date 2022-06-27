@@ -43,6 +43,13 @@ export class AppHostedZone extends Construct {
         hostedZoneId: rootHostedZoneId,
         zoneName: rootDomain,
       });
+
+      new CfnHealthCheck(this, 'HealthCheck', {
+        healthCheckConfig: {
+          type: 'HTTPS',
+          fullyQualifiedDomainName: zone.zoneName,
+        },
+      });
     } else {
       zone = new PublicHostedZone(this, 'HostedZone', {
         zoneName: `${subDomain}.${rootDomain}`,
@@ -64,13 +71,6 @@ export class AppHostedZone extends Construct {
         });
       }
     }
-
-    new CfnHealthCheck(this, 'HealthCheck', {
-      healthCheckConfig: {
-        type: 'HTTPS',
-        fullyQualifiedDomainName: zone.zoneName,
-      },
-    });
 
     this.hostedZone = zone;
   }
