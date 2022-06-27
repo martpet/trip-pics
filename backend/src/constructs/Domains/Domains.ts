@@ -8,11 +8,12 @@ import { Construct } from 'constructs';
 import { AppHostedZone } from './AppHostedZone';
 
 interface DomainsProps {
-  isProd: boolean;
   rootDomain: string;
   subDomain?: string;
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
+  isProd: boolean;
+  isStaging: boolean;
 }
 
 export class Domains extends Construct {
@@ -23,7 +24,14 @@ export class Domains extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { isProd, rootDomain, rootHostedZoneId, subDomain, zoneDelegationRole }: DomainsProps
+    {
+      rootDomain,
+      rootHostedZoneId,
+      subDomain,
+      zoneDelegationRole,
+      isProd,
+      isStaging,
+    }: DomainsProps
   ) {
     super(scope, id);
 
@@ -33,6 +41,7 @@ export class Domains extends Construct {
       rootHostedZoneId,
       zoneDelegationRole,
       isProd,
+      isStaging,
     });
 
     const certificate = new DnsValidatedCertificate(this, 'Certificate', {

@@ -14,6 +14,7 @@ interface AppHostedZoneProps {
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
   isProd: boolean;
+  isStaging: boolean;
 }
 
 export class AppHostedZone extends Construct {
@@ -28,6 +29,7 @@ export class AppHostedZone extends Construct {
       rootHostedZoneId,
       zoneDelegationRole,
       isProd,
+      isStaging,
     }: AppHostedZoneProps
   ) {
     super(scope, id);
@@ -42,13 +44,6 @@ export class AppHostedZone extends Construct {
       zone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
         hostedZoneId: rootHostedZoneId,
         zoneName: rootDomain,
-      });
-
-      new CfnHealthCheck(this, 'HealthCheck', {
-        healthCheckConfig: {
-          type: 'HTTPS',
-          fullyQualifiedDomainName: zone.zoneName,
-        },
       });
     } else {
       zone = new PublicHostedZone(this, 'HostedZone', {
@@ -70,6 +65,15 @@ export class AppHostedZone extends Construct {
           removalPolicy: RemovalPolicy.DESTROY,
         });
       }
+    }
+
+    if (isProd || isStaging) {
+      new CfnHealthCheck(this, 'HealthCheck', {
+        healthCheckConfig: {
+          type: 'HTTPS',
+          fullyQualifiedDomainName: zone.zoneName,
+        },
+      });
     }
 
     this.hostedZone = zone;

@@ -15,13 +15,15 @@ export class AppStack extends Stack {
 
     const { envName, subDomain } = appEnv;
     const isProd = envName === 'Production';
+    const isStaging = envName === 'Staging';
 
     const { hostedZone, certificate } = new Domains(this, 'Domains', {
-      isProd,
       rootDomain,
       subDomain,
       rootHostedZoneId,
       zoneDelegationRole,
+      isProd,
+      isStaging,
     });
 
     new StaticSite(this, 'ReactApp', {
