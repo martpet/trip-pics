@@ -2,7 +2,7 @@ import { resolve } from 'app-root-path';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { Domains, StaticSite } from '~/constructs';
+import { AppDomains, StaticSite } from '~/constructs';
 import { AppEnv, rootDomain, rootHostedZoneId, zoneDelegationRole } from '~/consts';
 
 interface AppStackProps extends StackProps {
@@ -17,7 +17,7 @@ export class AppStack extends Stack {
     const isProd = envName === 'Production';
     const isStaging = envName === 'Staging';
 
-    const { hostedZone, certificate } = new Domains(this, 'Domains', {
+    const { hostedZone, certificate } = new AppDomains(this, 'AppDomains', {
       rootDomain,
       subDomain,
       rootHostedZoneId,

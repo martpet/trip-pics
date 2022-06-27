@@ -5,9 +5,9 @@ import {
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 
-import { AppHostedZone } from './AppHostedZone';
+import { HostedZones } from './HostedZones';
 
-interface DomainsProps {
+interface AppDomainsProps {
   rootDomain: string;
   subDomain?: string;
   rootHostedZoneId: string;
@@ -16,7 +16,7 @@ interface DomainsProps {
   isStaging: boolean;
 }
 
-export class Domains extends Construct {
+export class AppDomains extends Construct {
   readonly hostedZone: IHostedZone;
 
   readonly certificate: ICertificate;
@@ -31,11 +31,11 @@ export class Domains extends Construct {
       zoneDelegationRole,
       isProd,
       isStaging,
-    }: DomainsProps
+    }: AppDomainsProps
   ) {
     super(scope, id);
 
-    const { hostedZone } = new AppHostedZone(this, 'HostedZone', {
+    const { hostedZone } = new HostedZones(this, 'HostedZones', {
       rootDomain,
       subDomain,
       rootHostedZoneId,
