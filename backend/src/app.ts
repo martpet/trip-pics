@@ -6,10 +6,9 @@ import { AppStack } from '~/stacks';
 const app = new App();
 
 appEnvs.forEach(({ env, ...appEnv }) => {
-  const { envName } = appEnv;
-  new AppStack(app, envName, {
-    stackName: `${appName}${envName}`,
-    env,
+  new AppStack(app, appEnv.envName, {
+    stackName: `${appName}${appEnv.envName}`,
     appEnv,
+    env,
   });
 });

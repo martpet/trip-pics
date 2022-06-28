@@ -19,8 +19,7 @@
 // 6. Push changes to "main" (staging env) and "prod" branches.
 // 7. Deploy pipeline stack: "npx cdk deploy pipeline --profile aws-profile"
 
-import { Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App, Stack, StackProps } from 'aws-cdk-lib';
 
 import { AppPipeline, CodeBuildStatusToGit } from '~/constructs';
 import { appEnvs, AppEnvWithAWSEnv, appName, gitRepo } from '~/consts';
@@ -35,7 +34,7 @@ const gitTokenSsmArn =
   'arn:aws:ssm:eu-central-1:791346621844:parameter/codebuild/git-token';
 
 export class PipelineStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps) {
+  constructor(scope: App, id: string, props: StackProps) {
     super(scope, id, props);
 
     const pipelineEnvNames = ['Production', 'Staging'] as const;

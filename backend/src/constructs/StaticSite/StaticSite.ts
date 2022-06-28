@@ -1,12 +1,12 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { Distribution, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
-import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
+
+import { WebDistribution } from '~/constructs';
 
 interface StaticSiteProps {
   distPath: string;
@@ -28,34 +28,11 @@ export class StaticSite extends Construct {
       autoDeleteObjects: true,
     });
 
-    const distributionLoggingBucket = new Bucket(this, 'DistributionLogging', {
-      removalPolicy: RemovalPolicy[isProd ? 'RETAIN' : 'DESTROY'],
-      autoDeleteObjects: !isProd,
-    });
-
-    const distribution = new Distribution(this, 'Distribution', {
-      defaultBehavior: {
-        origin: new S3Origin(destinationBucket),
-        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      },
-      domainNames: [hostedZone.zoneName],
-      defaultRootObject: 'index.html',
-      errorResponses: [
-        {
-          httpStatus: 404,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-        },
-        {
-          httpStatus: 403,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-        },
-      ],
+    const { distribution } = new WebDistribution(this, 'Distribution', {
       certificate,
-      enableLogging: true,
-      logIncludesCookies: true,
-      logBucket: distributionLoggingBucket,
+      hostedZone,
+      destinationBucket,
+      isProd,
     });
 
     new BucketDeployment(this, 'Deployment', {

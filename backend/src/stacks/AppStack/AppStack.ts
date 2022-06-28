@@ -1,6 +1,5 @@
 import { resolve } from 'app-root-path';
-import { Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App, Stack, StackProps } from 'aws-cdk-lib';
 
 import { Domains, StaticSite } from '~/constructs';
 import { AppEnv, rootDomain, rootHostedZoneId, zoneDelegationRole } from '~/consts';
@@ -10,7 +9,7 @@ interface AppStackProps extends StackProps {
 }
 
 export class AppStack extends Stack {
-  constructor(scope: Construct, id: string, { appEnv, ...props }: AppStackProps) {
+  constructor(scope: App, id: string, { appEnv, ...props }: AppStackProps) {
     super(scope, id, props);
 
     const { envName, subDomain, healthCheckAlertEmails } = appEnv;
