@@ -5,18 +5,19 @@ import {
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 
+import { HealthChecks } from '~/constructs';
+
 import { HostedZones } from './HostedZones';
 
-interface AppDomainsProps {
+interface DomainsProps {
   rootDomain: string;
   subDomain?: string;
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
   isProd: boolean;
-  isStaging: boolean;
 }
 
-export class AppDomains extends Construct {
+export class Domains extends Construct {
   readonly hostedZone: IHostedZone;
 
   readonly certificate: ICertificate;
@@ -24,14 +25,7 @@ export class AppDomains extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    {
-      rootDomain,
-      rootHostedZoneId,
-      subDomain,
-      zoneDelegationRole,
-      isProd,
-      isStaging,
-    }: AppDomainsProps
+    { rootDomain, rootHostedZoneId, subDomain, zoneDelegationRole, isProd }: DomainsProps
   ) {
     super(scope, id);
 
@@ -41,7 +35,6 @@ export class AppDomains extends Construct {
       rootHostedZoneId,
       zoneDelegationRole,
       isProd,
-      isStaging,
     });
 
     const certificate = new DnsValidatedCertificate(this, 'Certificate', {
@@ -49,6 +42,10 @@ export class AppDomains extends Construct {
       hostedZone,
       region: 'us-east-1',
       cleanupRoute53Records: true,
+    });
+
+    new HealthChecks(this, 'HealthChecks', {
+      domainName: hostedZone.zoneName,
     });
 
     this.hostedZone = hostedZone;

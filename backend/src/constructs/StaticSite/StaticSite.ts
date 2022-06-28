@@ -12,19 +12,25 @@ interface StaticSiteProps {
   distPath: string;
   hostedZone: IHostedZone;
   certificate: ICertificate;
+  isProd: boolean;
 }
 
 export class StaticSite extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { distPath, hostedZone, certificate }: StaticSiteProps
+    { distPath, hostedZone, certificate, isProd }: StaticSiteProps
   ) {
     super(scope, id);
 
     const destinationBucket = new Bucket(this, 'WebBucket', {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+    });
+
+    const distributionLoggingBucket = new Bucket(this, 'DistributionLogging', {
+      removalPolicy: RemovalPolicy[isProd ? 'RETAIN' : 'DESTROY'],
+      autoDeleteObjects: !isProd,
     });
 
     const distribution = new Distribution(this, 'Distribution', {
@@ -49,6 +55,7 @@ export class StaticSite extends Construct {
       certificate,
       enableLogging: true,
       logIncludesCookies: true,
+      logBucket: distributionLoggingBucket,
     });
 
     new BucketDeployment(this, 'Deployment', {

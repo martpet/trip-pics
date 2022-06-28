@@ -22,7 +22,7 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { AppPipeline, CodeBuildStatusGitIntegration } from '~/constructs';
+import { AppPipeline, CodeBuildStatusToGit } from '~/constructs';
 import { appEnvs, AppEnvWithAWSEnv, appName, gitRepo } from '~/consts';
 
 import packageJson from '../../../../package.json';
@@ -65,7 +65,7 @@ export class PipelineStack extends Stack {
         connectionArn,
       });
 
-      new CodeBuildStatusGitIntegration(this, `CodeBuildStatusToGit-${pipelineName}`, {
+      new CodeBuildStatusToGit(this, `CodeBuildStatusToGit-${pipelineName}`, {
         pipelineName,
         integrationType: 'GitHub',
         gitTokenSsmArn,

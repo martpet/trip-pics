@@ -1,7 +1,6 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { Role } from 'aws-cdk-lib/aws-iam';
 import {
-  CfnHealthCheck,
   CrossAccountZoneDelegationRecord,
   IHostedZone,
   PublicHostedZone,
@@ -14,7 +13,6 @@ interface HostedZonesProps {
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
   isProd: boolean;
-  isStaging: boolean;
 }
 
 export class HostedZones extends Construct {
@@ -29,7 +27,6 @@ export class HostedZones extends Construct {
       rootHostedZoneId,
       zoneDelegationRole,
       isProd,
-      isStaging,
     }: HostedZonesProps
   ) {
     super(scope, id);
@@ -50,8 +47,6 @@ export class HostedZones extends Construct {
         zoneName: `${subDomain}.${rootDomain}`,
       });
 
-      zone.applyRemovalPolicy(RemovalPolicy.DESTROY);
-
       if (zoneDelegationRole) {
         const delegationRole = Role.fromRoleArn(
           this,
@@ -65,15 +60,6 @@ export class HostedZones extends Construct {
           removalPolicy: RemovalPolicy.DESTROY,
         });
       }
-    }
-
-    if (isProd || isStaging) {
-      new CfnHealthCheck(this, 'HealthCheck', {
-        healthCheckConfig: {
-          type: 'HTTPS',
-          fullyQualifiedDomainName: zone.zoneName,
-        },
-      });
     }
 
     this.hostedZone = zone;
