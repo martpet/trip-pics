@@ -13,7 +13,7 @@ export class AppStack extends Stack {
   constructor(scope: Construct, id: string, { appEnv, ...props }: AppStackProps) {
     super(scope, id, props);
 
-    const { envName, subDomain } = appEnv;
+    const { envName, subDomain, healthCheckAlertEmails } = appEnv;
     const isProd = envName === 'Production';
 
     const { hostedZone, certificate } = new Domains(this, 'Domains', {
@@ -21,6 +21,7 @@ export class AppStack extends Stack {
       subDomain,
       rootHostedZoneId,
       zoneDelegationRole,
+      healthCheckAlertEmails,
       isProd,
     });
 

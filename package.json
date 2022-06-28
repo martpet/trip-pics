@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.118.0",
+    "@aws-sdk/client-sns": "^3.118.1",
     "app-root-path": "^3.0.0",
     "aws-cdk-lib": "2.29.1",
     "constructs": "^10.1.32",

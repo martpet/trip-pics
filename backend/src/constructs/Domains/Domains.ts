@@ -14,6 +14,7 @@ interface DomainsProps {
   subDomain?: string;
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
+  healthCheckAlertEmails?: string[];
   isProd: boolean;
 }
 
@@ -25,7 +26,14 @@ export class Domains extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { rootDomain, rootHostedZoneId, subDomain, zoneDelegationRole, isProd }: DomainsProps
+    {
+      rootDomain,
+      rootHostedZoneId,
+      subDomain,
+      zoneDelegationRole,
+      healthCheckAlertEmails,
+      isProd,
+    }: DomainsProps
   ) {
     super(scope, id);
 
@@ -46,6 +54,7 @@ export class Domains extends Construct {
 
     new HealthChecks(this, 'HealthChecks', {
       domainName: hostedZone.zoneName,
+      alertEmails: healthCheckAlertEmails,
     });
 
     this.hostedZone = hostedZone;

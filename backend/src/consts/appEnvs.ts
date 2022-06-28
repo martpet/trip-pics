@@ -1,12 +1,13 @@
 import { Environment } from 'aws-cdk-lib';
 
-import { region } from '~/consts';
+import { healthCheckAlertEmails, prodAccountId, region, testAccountId } from '~/consts';
 import { EnvName } from '~/types';
 import { getOrGenerateSubdomainName } from '~/utils';
 
 export interface AppEnv {
   envName: EnvName;
   subDomain?: string;
+  healthCheckAlertEmails?: string[];
 }
 
 export interface AppEnvWithAWSEnv extends AppEnv {
@@ -16,18 +17,13 @@ export interface AppEnvWithAWSEnv extends AppEnv {
 export const appEnvs: AppEnvWithAWSEnv[] = [
   {
     envName: 'Production',
-    env: {
-      account: '766373560006',
-      region,
-    },
+    env: { account: prodAccountId, region },
+    healthCheckAlertEmails,
   },
   {
     envName: 'Staging',
     subDomain: 'test',
-    env: {
-      account: '204115048155',
-      region,
-    },
+    env: { account: testAccountId, region },
   },
   {
     envName: 'Personal',

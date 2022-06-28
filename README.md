@@ -16,8 +16,6 @@ Ask the administrator to create a new account for you.
 
 ### Choose a personal subdomain
 
-Should be unique among other subdomains in the app.
-
 * Create a `.env.local` file in the repo root folder.
 * Add a `PERSONAL_SUBDOMAIN` env variable.
 
@@ -27,7 +25,7 @@ Should be unique among other subdomains in the app.
 
 ### Deploy
 
-`npm run deploy -- --profile <personal-account-aws-profile>`
+`npm run deploy -- --profile <personal-account-aws-profile> --require-approval never`
 
 ----
 
