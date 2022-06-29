@@ -1,6 +1,7 @@
-import { RemovalPolicy } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
+  CachePolicy,
   Distribution,
   IDistribution,
   ViewerProtocolPolicy,
@@ -32,29 +33,39 @@ export class WebDistribution extends Construct {
       autoDeleteObjects: !isProd,
     });
 
+    const errorResponses = [
+      {
+        httpStatus: 404,
+        responseHttpStatus: 200,
+        responsePagePath: '/index.html',
+      },
+
+      // Without s3:ListBucket, CloudFront has no way of returning a 404 response to callers and instead returns HTTP 403 Forbidden.
+      // https://github.com/aws/aws-cdk/issues/13983
+      {
+        httpStatus: 403,
+        responseHttpStatus: 200,
+        responsePagePath: '/index.html',
+      },
+    ];
+
+    const cachePolicy = new CachePolicy(this, 'CachePolicy', {
+      minTtl: Duration.days(365),
+    });
+
     this.distribution = new Distribution(this, 'Distribution', {
-      domainNames: [hostedZone.zoneName],
       defaultRootObject: 'index.html',
+      domainNames: [hostedZone.zoneName],
       certificate,
+      errorResponses,
       enableLogging: true,
       logIncludesCookies: true,
       logBucket: distributionLoggingBucket,
       defaultBehavior: {
         origin: new S3Origin(destinationBucket),
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy,
       },
-      errorResponses: [
-        {
-          httpStatus: 404,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-        },
-        {
-          httpStatus: 403,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-        },
-      ],
     });
   }
 }

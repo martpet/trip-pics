@@ -10,10 +10,9 @@ export const getOrGenerateSubdomainName = () => {
     const fileName = '.env.local';
     const filePath = resolve(fileName);
     subdomain = `${userInfo().username}${Date.now()}`;
-
     appendFileSync(filePath, `\r${envKey}=${subdomain}`);
     console.log(`❗️ Your personal environment's subdomain was written to ${filePath}.`);
   }
 
-  return subdomain;
+  return subdomain.replace(/_|-$|\.|\*|\\|\//gi, '');
 };

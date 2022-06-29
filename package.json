@@ -20,6 +20,7 @@
     "build:frontend": "vite build frontend",
     "synth": "cd backend && npx cdk synth",
     "deploy": "cd backend && npx cdk deploy Personal",
+    "destroy": "cd backend && npx cdk destroy Personal",
     "prepare": "husky install"
   },
   "dependencies": {

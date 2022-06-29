@@ -7,15 +7,15 @@ import {
 } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 
-interface HostedZonesProps {
+interface AppHostedZonesProps {
   rootDomain: string;
-  subDomain?: string;
+  envSubdomain?: string;
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
   isProd: boolean;
 }
 
-export class HostedZones extends Construct {
+export class AppHostedZones extends Construct {
   readonly hostedZone: IHostedZone;
 
   constructor(
@@ -23,15 +23,15 @@ export class HostedZones extends Construct {
     id: string,
     {
       rootDomain,
-      subDomain,
+      envSubdomain,
       rootHostedZoneId,
       zoneDelegationRole,
       isProd,
-    }: HostedZonesProps
+    }: AppHostedZonesProps
   ) {
     super(scope, id);
 
-    if (!isProd && !subDomain) {
+    if (!isProd && !envSubdomain) {
       throw new Error('Subdomain is required');
     }
 
@@ -44,7 +44,7 @@ export class HostedZones extends Construct {
       });
     } else {
       zone = new PublicHostedZone(this, 'HostedZone', {
-        zoneName: `${subDomain}.${rootDomain}`,
+        zoneName: `${envSubdomain}.${rootDomain}`,
       });
 
       if (zoneDelegationRole) {

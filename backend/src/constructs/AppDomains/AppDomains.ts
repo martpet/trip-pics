@@ -7,39 +7,39 @@ import { Construct } from 'constructs';
 
 import { HealthChecks } from '~/constructs';
 
-import { HostedZones } from './HostedZones';
+import { AppHostedZones } from './AppHostedZones';
 
-interface DomainsProps {
+interface AppDomainsProps {
   rootDomain: string;
-  subDomain?: string;
+  envSubdomain?: string;
   rootHostedZoneId: string;
   zoneDelegationRole?: string;
   healthCheckAlertEmails?: string[];
   isProd: boolean;
 }
 
-export class Domains extends Construct {
-  readonly hostedZone: IHostedZone;
+export class AppDomains extends Construct {
+  public readonly hostedZone: IHostedZone;
 
-  readonly certificate: ICertificate;
+  public readonly certificate: ICertificate;
 
   constructor(
     scope: Construct,
     id: string,
     {
       rootDomain,
+      envSubdomain,
       rootHostedZoneId,
-      subDomain,
       zoneDelegationRole,
       healthCheckAlertEmails,
       isProd,
-    }: DomainsProps
+    }: AppDomainsProps
   ) {
     super(scope, id);
 
-    const { hostedZone } = new HostedZones(this, 'HostedZones', {
+    const { hostedZone } = new AppHostedZones(this, 'HostedZones', {
       rootDomain,
-      subDomain,
+      envSubdomain,
       rootHostedZoneId,
       zoneDelegationRole,
       isProd,
@@ -48,7 +48,7 @@ export class Domains extends Construct {
     const certificate = new DnsValidatedCertificate(this, 'Certificate', {
       domainName: hostedZone.zoneName,
       hostedZone,
-      region: 'us-east-1',
+      region: 'us-east-1', // CloudFront must request the certificate in US East
       cleanupRoute53Records: true,
     });
 

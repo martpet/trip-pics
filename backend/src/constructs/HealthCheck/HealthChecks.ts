@@ -25,6 +25,8 @@ export class HealthChecks extends Construct {
       },
     });
 
+    // Route 53 metrics are not available if you select any other region (not US East).
+    // https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/monitoring-health-checks.html
     const healthCheckRegion = 'us-east-1';
 
     const topic = new CrossRegionSNSTopic(this, 'Topic', {
