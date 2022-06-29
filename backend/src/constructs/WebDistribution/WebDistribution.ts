@@ -1,4 +1,4 @@
-import { Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { Duration } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   CachePolicy,
@@ -8,14 +8,13 @@ import {
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';
-import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct, IConstruct } from 'constructs';
 
 interface WebDistributionProps {
   certificate: ICertificate;
   destinationBucket: IBucket;
   hostedZone: IHostedZone;
-  isDev: boolean;
 }
 
 export class WebDistribution extends Construct {
@@ -24,14 +23,9 @@ export class WebDistribution extends Construct {
   constructor(
     scope: IConstruct,
     id: string,
-    { certificate, destinationBucket, hostedZone, isDev }: WebDistributionProps
+    { certificate, destinationBucket, hostedZone }: WebDistributionProps
   ) {
     super(scope, id);
-
-    const distributionLoggingBucket = new Bucket(this, 'DistributionLogging', {
-      removalPolicy: RemovalPolicy[isDev ? 'DESTROY' : 'RETAIN'],
-      autoDeleteObjects: isDev,
-    });
 
     const errorResponses = [
       {
@@ -60,7 +54,6 @@ export class WebDistribution extends Construct {
       errorResponses,
       enableLogging: true,
       logIncludesCookies: true,
-      logBucket: distributionLoggingBucket,
       defaultBehavior: {
         origin: new S3Origin(destinationBucket),
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

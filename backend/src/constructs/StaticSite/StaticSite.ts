@@ -12,14 +12,13 @@ interface StaticSiteProps {
   distPath: string;
   hostedZone: IHostedZone;
   certificate: ICertificate;
-  isDev: boolean;
 }
 
 export class StaticSite extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { distPath, hostedZone, certificate, isDev }: StaticSiteProps
+    { distPath, hostedZone, certificate }: StaticSiteProps
   ) {
     super(scope, id);
 
@@ -32,7 +31,6 @@ export class StaticSite extends Construct {
       certificate,
       hostedZone,
       destinationBucket,
-      isDev,
     });
 
     new BucketDeployment(this, 'Deployment', {

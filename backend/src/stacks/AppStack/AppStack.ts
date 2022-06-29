@@ -34,7 +34,6 @@ export class AppStack extends Stack {
       distPath: resolve('frontend/dist'),
       hostedZone,
       certificate,
-      isDev,
     });
   }
 }
