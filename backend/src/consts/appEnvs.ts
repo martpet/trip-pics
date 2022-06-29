@@ -1,6 +1,9 @@
 import { Environment } from 'aws-cdk-lib';
 
 import {
+  crossAccountDevHostedZoneRole,
+  crossAccountRootHostedZoneRole,
+  devSubdomain,
   prodAccountId,
   prodHealthCheckAlertEmails,
   region,
@@ -14,6 +17,7 @@ export interface AppEnv {
   envName: EnvName;
   envSubdomain?: string;
   healthCheckAlertEmails?: string[];
+  crossAccountHostedZoneRole?: string;
 }
 
 export interface AppEnvWithAWSEnv extends AppEnv {
@@ -28,12 +32,14 @@ export const appEnvs: AppEnvWithAWSEnv[] = [
   },
   {
     envName: 'Staging',
-    envSubdomain: 'test',
     env: { account: stagingAccountId, region },
+    envSubdomain: 'test',
     healthCheckAlertEmails: stagingHealthCheckAlertEmails,
+    crossAccountHostedZoneRole: crossAccountRootHostedZoneRole,
   },
   {
     envName: 'Personal',
-    envSubdomain: `${getOrGenerateSubdomainName()}.dev`,
+    envSubdomain: `${getOrGenerateSubdomainName()}.${devSubdomain}`,
+    crossAccountHostedZoneRole: crossAccountDevHostedZoneRole,
   },
 ];

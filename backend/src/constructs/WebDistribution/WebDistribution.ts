@@ -15,7 +15,7 @@ interface WebDistributionProps {
   certificate: ICertificate;
   destinationBucket: IBucket;
   hostedZone: IHostedZone;
-  isProd: boolean;
+  isDev: boolean;
 }
 
 export class WebDistribution extends Construct {
@@ -24,13 +24,13 @@ export class WebDistribution extends Construct {
   constructor(
     scope: IConstruct,
     id: string,
-    { certificate, destinationBucket, hostedZone, isProd }: WebDistributionProps
+    { certificate, destinationBucket, hostedZone, isDev }: WebDistributionProps
   ) {
     super(scope, id);
 
     const distributionLoggingBucket = new Bucket(this, 'DistributionLogging', {
-      removalPolicy: RemovalPolicy[isProd ? 'RETAIN' : 'DESTROY'],
-      autoDeleteObjects: !isProd,
+      removalPolicy: RemovalPolicy[isDev ? 'DESTROY' : 'RETAIN'],
+      autoDeleteObjects: isDev,
     });
 
     const errorResponses = [

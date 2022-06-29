@@ -13,9 +13,11 @@ interface AppDomainsProps {
   rootDomain: string;
   envSubdomain?: string;
   rootHostedZoneId: string;
-  zoneDelegationRole?: string;
+  devHostedZoneId: string;
+  crossAccountHostedZoneRole?: string;
   healthCheckAlertEmails?: string[];
   isProd: boolean;
+  isDev: boolean;
 }
 
 export class AppDomains extends Construct {
@@ -30,9 +32,11 @@ export class AppDomains extends Construct {
       rootDomain,
       envSubdomain,
       rootHostedZoneId,
-      zoneDelegationRole,
+      devHostedZoneId,
+      crossAccountHostedZoneRole,
       healthCheckAlertEmails,
       isProd,
+      isDev,
     }: AppDomainsProps
   ) {
     super(scope, id);
@@ -41,8 +45,10 @@ export class AppDomains extends Construct {
       rootDomain,
       envSubdomain,
       rootHostedZoneId,
-      zoneDelegationRole,
+      devHostedZoneId,
+      crossAccountHostedZoneRole,
       isProd,
+      isDev,
     });
 
     const certificate = new DnsValidatedCertificate(this, 'Certificate', {

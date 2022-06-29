@@ -11,8 +11,10 @@ interface AppHostedZonesProps {
   rootDomain: string;
   envSubdomain?: string;
   rootHostedZoneId: string;
-  zoneDelegationRole?: string;
+  devHostedZoneId: string;
+  crossAccountHostedZoneRole?: string;
   isProd: boolean;
+  isDev: boolean;
 }
 
 export class AppHostedZones extends Construct {
@@ -25,8 +27,10 @@ export class AppHostedZones extends Construct {
       rootDomain,
       envSubdomain,
       rootHostedZoneId,
-      zoneDelegationRole,
+      devHostedZoneId,
+      crossAccountHostedZoneRole,
       isProd,
+      isDev,
     }: AppHostedZonesProps
   ) {
     super(scope, id);
@@ -35,33 +39,34 @@ export class AppHostedZones extends Construct {
       throw new Error('Subdomain is required');
     }
 
-    let zone: IHostedZone;
-
     if (isProd) {
-      zone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
-        hostedZoneId: rootHostedZoneId,
-        zoneName: rootDomain,
-      });
+      this.hostedZone = PublicHostedZone.fromPublicHostedZoneAttributes(
+        this,
+        'HostedZone',
+        {
+          hostedZoneId: rootHostedZoneId,
+          zoneName: rootDomain,
+        }
+      );
     } else {
-      zone = new PublicHostedZone(this, 'HostedZone', {
+      this.hostedZone = new PublicHostedZone(this, 'HostedZone', {
         zoneName: `${envSubdomain}.${rootDomain}`,
       });
-
-      if (zoneDelegationRole) {
-        const delegationRole = Role.fromRoleArn(
-          this,
-          'DelegationRole',
-          zoneDelegationRole
-        );
-        new CrossAccountZoneDelegationRecord(this, 'ZoneDelegation', {
-          parentHostedZoneName: rootDomain,
-          delegatedZone: zone,
-          delegationRole,
-          removalPolicy: RemovalPolicy.DESTROY,
-        });
-      }
     }
 
-    this.hostedZone = zone;
+    if (!isProd && crossAccountHostedZoneRole) {
+      const delegationRole = Role.fromRoleArn(
+        this,
+        'ZoneDelegationRole',
+        crossAccountHostedZoneRole
+      );
+
+      new CrossAccountZoneDelegationRecord(this, 'ZoneDelegation', {
+        parentHostedZoneId: isDev ? devHostedZoneId : rootHostedZoneId,
+        delegatedZone: this.hostedZone,
+        delegationRole,
+        removalPolicy: RemovalPolicy.DESTROY,
+      });
+    }
   }
 }
