@@ -8,7 +8,7 @@
 
 ----
 
-## Personal Dev AWS environment
+## Personal *Dev* AWS environment
 
 ### Create a personal *Dev* account in AWS Organizations
 
@@ -35,14 +35,14 @@ Admin rights **not** required.
 
 ----
 
-## Prod and Staging AWS environments
+## *Prod* and *Staging* AWS environments
 
 ### Create AWS Organizations units and accounts.
 * Create *Dev* and *NonDev* units.
-* Create *Production* and `Staging` accounts under *Dev* unit.
+* Create *Production* and *Staging* accounts under *Dev* unit.
 
 ### Bootstrap
-It is **recommended** to use separate AWS accounts for each environment (Production, Staging, Dev). It is also possible to have all environments deployed to a single account (in which case change the .github/workflows to deploy to a single environment).
+It is **recommended** to use separate AWS accounts for each environment (Production, Staging, Dev). It is also possible to have all environments deployed to a single account, in which case change the .github/workflows to it.
 
 For each environment run (with admin rights):
 
@@ -52,22 +52,22 @@ For each environment run (with admin rights):
 
 In the *Production* account:
 
-* Create the *root* hosted with a name `somedomain.com`.
-* Write the *root* hosted zone id to a variable `rootHostedZoneId` in *consts/appConsts.ts*.
-* Create the *dev* hosted zone with a name `dev.somedomain.com`.
-* Write the *dev* hosted zone id to a variable `devHostedZoneId` in *consts/appConsts.ts*.
+* Create the *root* hosted with the name `somedomain.com`.
+* Copy the *root* hosted zone id to a variable named `rootHostedZoneId` in *backend/consts/appConsts.ts*.
+* Create the *dev* hosted zone with the name `dev.somedomain.com`.
+* Copy the *dev* hosted zone id to a variable named `devHostedZoneId` in *backend/consts/appConsts.ts*.
 
 ### Add a domain
 
 In the *Production* account:
 
 * Add a domain in Route53.
-* Copy the domain NS records to the root hosted zone.
-* Write the domain name as a variable `rootDomain` in *consts/appConsts.ts*
+* Put the name servers of the domain as a NS record in the `Root` hosted zone.
+* Copy the domain name to a variable named `rootDomain` in *backend/consts/appConsts.ts*
 
-### Create policies for editing hosted zones
+### Create policies for the hosted zones
 
-In the *Production* account add 2 policies named:
+In the *Production* account add 2 policies with names:
 
 * `ChangeRootHostedZoneRecordSets`
 * `ChangeDevHostedZoneRecordSets`
@@ -96,13 +96,15 @@ In the *Production* account add 2 policies named:
 
 ### Create roles for the policies
 
-In the Production account add 2 roles named:
+In the Production account add 2 roles with names:
 
 * `CrossAccountRootHostedZone`
 * `CrossAccountDevHostedZone`
 
+Add a Trust relationship policy the the role:
+
 <details>
-  <summary>Trust policy</summary>
+  <summary>Trust relationship policy content</summary>
 
   ```
   {
@@ -116,7 +118,7 @@ In the Production account add 2 roles named:
             "Action": "sts:AssumeRole",
             "Condition": {
                 "ForAnyValue:StringLike": {
-                    "aws:PrincipalOrgPaths": "<organizations-path-to-unit-dev-or-nondev>/*"
+                    "aws:PrincipalOrgPaths": "<organizations-path-to-unit-Dev-or-NonDev>/*"
                 }
             }
         }
@@ -125,7 +127,11 @@ In the Production account add 2 roles named:
   ```
 </details>
 
-Write the ARN of the 2 roles to *crossAccountDevHostedZoneRole* and *crossAccountRootHostedZoneRole* in *consts/appConsts.ts*.
+**PrincipalOrgPaths** should be something like `o-dqkaknenun/r-weph/ou-weph-n389l0xd/ou-weph-kvrx3xqm/*`, where:
+*o-dqkaknenun* is the AWS Organizations id,\
+*r-weph* is the parent organization unit (`Root`) id ,\
+*ou-weph-kvrx3xqm* is an organization Unit (`Dev` or `NonDev`) id.
 
-The value for *PrincipalOrgPaths* should be similar to:  `o-dqkaknenun/r-weph/ou-weph-n389l0xd/ou-weph-kvrx3xqm/*`, where
-*o-dqkaknenun* is the organization id, *r-weph* is the root id, and *ou-weph-kvrx3xqm* is the id of the `Dev` or `NonDev` units.
+Add the corresponding hosted zone policy to each role.
+
+Copy the ARNs of the 2 roles to variables named `crossAccountDevHostedZoneRole` and `crossAccountRootHostedZoneRole` in *backend/consts/appConsts.ts*.
