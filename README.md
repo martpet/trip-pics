@@ -77,7 +77,6 @@ In the *Production* account add 2 policies with names:
 <details>
     <summary>Policy content</summary>
 
-    ```
     {
         "Version": "2012-10-17",
         "Statement": [
@@ -93,7 +92,6 @@ In the *Production* account add 2 policies with names:
             }
         ]
     }
-    ```
 </details>
 
 ### Create roles for the hosted zones policies
@@ -108,7 +106,6 @@ Add a Trust relationship policy the the role:
 <details>
     <summary>Trust relationship policy content</summary>
 
-    ```
     {
         "Version": "2012-10-17",
         "Statement": [
@@ -126,12 +123,6 @@ Add a Trust relationship policy the the role:
             }
         ]
     }
-    ```
-
-    **PrincipalOrgPaths** is something like `o-dqkaknenun/r-weph/ou-weph-n389l0xd/ou-weph-kvrx3xqm/*`, where:
-    *o-dqkaknenun* is the AWS Organization id,\
-    *r-weph* is the *Root* unit id ,\
-    *ou-weph-kvrx3xqm* is the *Dev* or *NonDev* unit id.
 </details>
 
 Add the corresponding policy to each role.
@@ -150,7 +141,6 @@ There are two options:
 <details>
     <summary>Permissions for an external account in CrossAccountDevHostedZone trust policy</summary>
 
-    ```
      {
         "Effect": "Allow",
         "Principal": {
@@ -158,5 +148,4 @@ There are two options:
         },
         "Action": "sts:AssumeRole"
     }
-    ```
 <details>
