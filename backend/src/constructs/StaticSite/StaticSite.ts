@@ -29,7 +29,7 @@ export class StaticSite extends Construct {
 
     const { distribution } = new WebDistribution(this, 'Distribution', {
       certificate,
-      hostedZone,
+      domainName: hostedZone.zoneName,
       destinationBucket,
     });
 

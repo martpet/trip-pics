@@ -7,14 +7,13 @@ import {
   ViewerProtocolPolicy,
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct, IConstruct } from 'constructs';
 
 interface WebDistributionProps {
   certificate: ICertificate;
   destinationBucket: IBucket;
-  hostedZone: IHostedZone;
+  domainName: string;
 }
 
 export class WebDistribution extends Construct {
@@ -23,7 +22,7 @@ export class WebDistribution extends Construct {
   constructor(
     scope: IConstruct,
     id: string,
-    { certificate, destinationBucket, hostedZone }: WebDistributionProps
+    { certificate, destinationBucket, domainName }: WebDistributionProps
   ) {
     super(scope, id);
 
@@ -49,7 +48,7 @@ export class WebDistribution extends Construct {
 
     this.distribution = new Distribution(this, 'Distribution', {
       defaultRootObject: 'index.html',
-      domainNames: [hostedZone.zoneName],
+      domainNames: [domainName],
       certificate,
       errorResponses,
       enableLogging: true,
