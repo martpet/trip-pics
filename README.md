@@ -8,65 +8,69 @@
 
 ----
 
-## Personal dev environment
+## Personal Dev AWS environment
 
-### Create a personal dev account in AWS Organizations
+### Create a personal *Dev* account in AWS Organizations
 
 Ask the administrator to create a new account for you in the *Dev* unit.
 
-### Choose a name for the personal subdomain
+### Choose a personal subdomain name
 
-It should be like `**name**.dev.xyz.com`
+The domain will be like *john*.dev.domain.com
 
 * Create a *.env.local* file in the repo root folder.
-* Write the choosen name as an env variable *PERSONAL_SUBDOMAIN* in *.env.local*.
+* Write the choosen name (*john*) as an env variable *PERSONAL_SUBDOMAIN* in *.env.local*.
 
 ### Bootstrap
 
-`cd backend && npx cdk bootstrap <account id>/<region> --profile <personal-account-aws-profile>`
+Admin rights required.
+
+`cd backend && npx cdk bootstrap --profile aws-profile-name`
 
 ### Deploy
 
-`npm run deploy -- --profile <personal-account-aws-profile> --require-approval never`
+Admin rights **not** required.
+
+`npm run deploy -- --profile aws-rofile-name --require-approval never`
 
 ----
 
-## `Prod` and `Staging` AWS environments
+## Prod and Staging AWS environments
 
-### 1. Create AWS Organizations units and accounts.
+### Create AWS Organizations units and accounts.
 * Create *Dev* and *NonDev* units.
 * Create *Production* and `Staging` accounts under *Dev* unit.
 
-### 2. Bootstrap
-It is **recommended** to use separate AWS accounts for each environment (Production, Staging, etc). It is also possible to have all environments deployed to a single account (in which case change the .github/workflows to deploy to the same account).
+### Bootstrap
+It is **recommended** to use separate AWS accounts for each environment (Production, Staging, Dev). It is also possible to have all environments deployed to a single account (in which case change the .github/workflows to deploy to a single environment).
 
-For each deployment environment run (with admin permissions):
+For each environment run (with admin rights):
 
-`cd backend && npx bootstrap --profile <aws-profile-for-the-account>`
+`cd backend && npx cdk bootstrap --profile aws-profile-name`
 
-### 3. Add AWS hosted zones
+### Add AWS hosted zones
 
 In the *Production* account:
 
-* Create the root hosted zone. Name: *somedomain.com*.
-* Create the dev hosted zone. Name: *dev.somedomain.com*.
-* Write the root hosted zone id to a variable *rootHostedZoneId* in *consts/appConsts.ts*.
-* Write the dev hosted zone id as variable *devHostedZoneId* in *consts/appConsts.ts*.
+* Create the *root* hosted with a name `somedomain.com`.
+* Write the *root* hosted zone id to a variable `rootHostedZoneId` in *consts/appConsts.ts*.
+* Create the *dev* hosted zone with a name `dev.somedomain.com`.
+* Write the *dev* hosted zone id to a variable `devHostedZoneId` in *consts/appConsts.ts*.
 
-### 4. Add a domain
+### Add a domain
 
 In the *Production* account:
 
 * Add a domain in Route53.
 * Copy the domain NS records to the root hosted zone.
-* Write the domain name as a variable *rootDomain* in *consts/appConsts.ts*
+* Write the domain name as a variable `rootDomain` in *consts/appConsts.ts*
 
-### 5. Create policies for editing hosted zones
+### Create policies for editing hosted zones
 
-In the *Production* account *add 2 policies* named:
+In the *Production* account add 2 policies named:
 
-* *ChangeRootHostedZoneRecordSets*
-* *ChangeDevHostedZoneRecordSets*
+* `ChangeRootHostedZoneRecordSets`
+* `ChangeDevHostedZoneRecordSets`
 
 <details>
   <summary>Policy content</summary>
@@ -90,12 +94,12 @@ In the *Production* account *add 2 policies* named:
   ```
 </details>
 
-### 6. Create roles for hosted zones policies
+### Create roles for the policies
 
-In the Production account **add 2 roles** named:
+In the Production account add 2 roles named:
 
-* CrossAccountRootHostedZone
-* CrossAccountDevHostedZone
+* `CrossAccountRootHostedZone`
+* `CrossAccountDevHostedZone`
 
 <details>
   <summary>Trust policy</summary>
@@ -124,4 +128,4 @@ In the Production account **add 2 roles** named:
 Write the ARN of the 2 roles to *crossAccountDevHostedZoneRole* and *crossAccountRootHostedZoneRole* in *consts/appConsts.ts*.
 
 The value for *PrincipalOrgPaths* should be similar to:  `o-dqkaknenun/r-weph/ou-weph-n389l0xd/ou-weph-kvrx3xqm/*`, where
-*o-dqkaknenun* is the organization id, *r-weph* is the root id, and *ou-weph-kvrx3xqm* is the id of the Dev or NonDev units.
+*o-dqkaknenun* is the organization id, *r-weph* is the root id, and *ou-weph-kvrx3xqm* is the id of the `Dev` or `NonDev` units.
