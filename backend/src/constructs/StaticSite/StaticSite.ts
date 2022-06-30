@@ -10,6 +10,7 @@ import { WebDistribution } from '~/constructs';
 
 interface StaticSiteProps {
   distPath: string;
+  domainName: string;
   hostedZone: IHostedZone;
   certificate: ICertificate;
 }
@@ -18,7 +19,7 @@ export class StaticSite extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { distPath, hostedZone, certificate }: StaticSiteProps
+    { distPath, domainName, hostedZone, certificate }: StaticSiteProps
   ) {
     super(scope, id);
 
@@ -29,7 +30,7 @@ export class StaticSite extends Construct {
 
     const { distribution } = new WebDistribution(this, 'Distribution', {
       certificate,
-      domainName: hostedZone.zoneName,
+      domainName,
       destinationBucket,
     });
 

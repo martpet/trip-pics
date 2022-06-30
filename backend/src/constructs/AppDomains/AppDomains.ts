@@ -15,12 +15,14 @@ interface AppDomainsProps {
   rootHostedZoneId: string;
   devHostedZoneId: string;
   crossAccountHostedZoneRole?: string;
-  healthCheckAlertEmails?: string[];
+  healthCheckAlarmEmails?: string[];
   isProd: boolean;
   isDev: boolean;
 }
 
 export class AppDomains extends Construct {
+  readonly domainName: string;
+
   readonly hostedZone: IHostedZone;
 
   readonly certificate: ICertificate;
@@ -34,14 +36,14 @@ export class AppDomains extends Construct {
       rootHostedZoneId,
       devHostedZoneId,
       crossAccountHostedZoneRole,
-      healthCheckAlertEmails,
+      healthCheckAlarmEmails,
       isProd,
       isDev,
     }: AppDomainsProps
   ) {
     super(scope, id);
 
-    const { hostedZone } = new AppHostedZones(this, 'HostedZones', {
+    const { domainName, hostedZone } = new AppHostedZones(this, 'HostedZones', {
       rootDomain,
       envSubdomain,
       rootHostedZoneId,
@@ -60,9 +62,10 @@ export class AppDomains extends Construct {
 
     new HealthChecks(this, 'HealthChecks', {
       domainName: hostedZone.zoneName,
-      alertEmails: healthCheckAlertEmails,
+      alarmEmails: healthCheckAlarmEmails,
     });
 
+    this.domainName = domainName;
     this.hostedZone = hostedZone;
     this.certificate = certificate;
   }

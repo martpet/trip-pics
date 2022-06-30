@@ -5,14 +5,14 @@ import { CrossRegionMetricAlarm, CrossRegionSNSTopic } from '~/constructs';
 
 interface HealthChecksProps {
   domainName: string;
-  alertEmails?: string[];
+  alarmEmails?: string[];
 }
 
 export class HealthChecks extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { domainName, alertEmails }: HealthChecksProps
+    { domainName, alarmEmails }: HealthChecksProps
   ) {
     super(scope, id);
 
@@ -32,7 +32,7 @@ export class HealthChecks extends Construct {
     const topic = new CrossRegionSNSTopic(this, 'Topic', {
       region: healthCheckRegion,
       createTopicInput: { Name: 'Route53HealthCheck' },
-      subscribeInputs: alertEmails?.map((Endpoint) => ({ Endpoint, Protocol: 'email' })),
+      subscribeInputs: alarmEmails?.map((Endpoint) => ({ Endpoint, Protocol: 'email' })),
     });
 
     new CrossRegionMetricAlarm(this, `Alarm`, {

@@ -18,6 +18,8 @@ interface AppHostedZonesProps {
 }
 
 export class AppHostedZones extends Construct {
+  readonly domainName: string;
+
   readonly hostedZone: IHostedZone;
 
   constructor(
@@ -53,6 +55,8 @@ export class AppHostedZones extends Construct {
         zoneName: `${envSubdomain}.${rootDomain}`,
       });
     }
+
+    this.domainName = this.hostedZone.zoneName;
 
     if (!isProd && crossAccountHostedZoneRole) {
       const delegationRole = Role.fromRoleArn(

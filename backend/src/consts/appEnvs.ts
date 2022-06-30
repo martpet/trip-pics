@@ -4,11 +4,11 @@ import {
   crossAccountDevHostedZoneRole,
   crossAccountRootHostedZoneRole,
   devSubdomain,
+  healthCheckAlarmEmailsProd,
+  healthCheckAlarmEmailsStaging,
   prodAccountId,
-  prodHealthCheckAlertEmails,
   region,
   stagingAccountId,
-  stagingHealthCheckAlertEmails,
 } from '~/consts';
 import { EnvName } from '~/types';
 import { getOrGenerateSubdomainName } from '~/utils';
@@ -16,7 +16,7 @@ import { getOrGenerateSubdomainName } from '~/utils';
 export interface AppEnv {
   envName: EnvName;
   envSubdomain?: string;
-  healthCheckAlertEmails?: string[];
+  healthCheckAlarmEmails?: string[];
   crossAccountHostedZoneRole?: string;
 }
 
@@ -28,13 +28,13 @@ export const appEnvs: AppEnvWithAWSEnv[] = [
   {
     envName: 'Production',
     env: { account: prodAccountId, region },
-    healthCheckAlertEmails: prodHealthCheckAlertEmails,
+    healthCheckAlarmEmails: healthCheckAlarmEmailsProd,
   },
   {
     envName: 'Staging',
     env: { account: stagingAccountId, region },
     envSubdomain: 'test',
-    healthCheckAlertEmails: stagingHealthCheckAlertEmails,
+    healthCheckAlarmEmails: healthCheckAlarmEmailsStaging,
     crossAccountHostedZoneRole: crossAccountRootHostedZoneRole,
   },
   {

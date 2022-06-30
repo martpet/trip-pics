@@ -13,25 +13,26 @@ export class AppStack extends Stack {
   constructor(scope: Construct, id: string, { appEnv, ...props }: AppStackProps) {
     super(scope, id, props);
 
-    const { envName, envSubdomain, healthCheckAlertEmails, crossAccountHostedZoneRole } =
+    const { envName, envSubdomain, healthCheckAlarmEmails, crossAccountHostedZoneRole } =
       appEnv;
 
     const isProd = envName === 'Production';
     const isDev = envName === 'Personal';
 
-    const { hostedZone, certificate } = new AppDomains(this, 'Domains', {
+    const { domainName, hostedZone, certificate } = new AppDomains(this, 'Domains', {
       rootDomain,
       envSubdomain,
       rootHostedZoneId,
       devHostedZoneId,
       crossAccountHostedZoneRole,
-      healthCheckAlertEmails,
+      healthCheckAlarmEmails,
       isProd,
       isDev,
     });
 
     new StaticSite(this, 'ReactApp', {
       distPath: resolve('frontend/dist'),
+      domainName,
       hostedZone,
       certificate,
     });
