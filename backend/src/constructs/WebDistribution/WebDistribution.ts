@@ -18,7 +18,7 @@ interface WebDistributionProps {
 }
 
 export class WebDistribution extends Construct {
-  public readonly distribution: IDistribution;
+  readonly distribution: IDistribution;
 
   constructor(
     scope: IConstruct,

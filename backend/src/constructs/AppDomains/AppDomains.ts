@@ -21,9 +21,9 @@ interface AppDomainsProps {
 }
 
 export class AppDomains extends Construct {
-  public readonly hostedZone: IHostedZone;
+  readonly hostedZone: IHostedZone;
 
-  public readonly certificate: ICertificate;
+  readonly certificate: ICertificate;
 
   constructor(
     scope: Construct,

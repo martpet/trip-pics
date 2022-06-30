@@ -9,7 +9,7 @@ import { CrossRegionSNSTopicHandlerProps } from './CrossRegionSNSTopic.handler';
 type CrossRegionSNSTopicProps = CrossRegionSNSTopicHandlerProps;
 
 export class CrossRegionSNSTopic extends Construct {
-  public readonly arn: string;
+  readonly arn: string;
 
   constructor(scope: Construct, id: string, props: CrossRegionSNSTopicProps) {
     super(scope, id);
