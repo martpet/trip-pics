@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: npm ci -f
 
-      - name: Test, lint & check types
+      - name: Test, lint & check
         run: npm test
 
       - name: Build frontend
