@@ -1,45 +1,70 @@
 import { Environment } from 'aws-cdk-lib';
 
 import {
-  crossAccountDevHostedZoneRole,
-  crossAccountRootHostedZoneRole,
-  devSubdomain,
+  devCrossAccountZoneDelegationRoleArn,
+  devHostedZoneId,
   healthCheckAlarmEmailsProd,
   healthCheckAlarmEmailsStaging,
   prodAccountId,
   region,
+  rootHostedZoneId,
   stagingAccountId,
+  stagingHostedZoneId,
 } from '~/consts';
 import { EnvName } from '~/types';
 import { getOrGenerateSubdomainName } from '~/utils';
 
-export interface AppEnv {
+export interface CommonAppEnvProps {
   envName: EnvName;
   envSubdomain?: string;
   healthCheckAlarmEmails?: string[];
-  crossAccountHostedZoneRole?: string;
 }
 
-export interface AppEnvWithAWSEnv extends AppEnv {
-  env?: Environment;
+interface WithExistingHostedZone extends CommonAppEnvProps {
+  hostedZoneId: string;
+  crossAccountParentHostedZone?: never;
 }
+
+interface WithoutExistingHostedZone extends CommonAppEnvProps {
+  hostedZoneId?: never;
+  crossAccountParentHostedZone: {
+    zoneId: string;
+    roleArn: string;
+  };
+}
+
+export type AppEnv = WithExistingHostedZone | WithoutExistingHostedZone;
+
+export type AppEnvWithAWSEnv = AppEnv & {
+  env?: Environment;
+};
 
 export const appEnvs: AppEnvWithAWSEnv[] = [
   {
     envName: 'Production',
-    env: { account: prodAccountId, region },
     healthCheckAlarmEmails: healthCheckAlarmEmailsProd,
+    hostedZoneId: rootHostedZoneId,
+    env: {
+      account: prodAccountId,
+      region,
+    },
   },
   {
     envName: 'Staging',
-    env: { account: stagingAccountId, region },
     envSubdomain: 'test',
     healthCheckAlarmEmails: healthCheckAlarmEmailsStaging,
-    crossAccountHostedZoneRole: crossAccountRootHostedZoneRole,
+    hostedZoneId: stagingHostedZoneId,
+    env: {
+      account: stagingAccountId,
+      region,
+    },
   },
   {
     envName: 'Personal',
-    envSubdomain: `${getOrGenerateSubdomainName()}.${devSubdomain}`,
-    crossAccountHostedZoneRole: crossAccountDevHostedZoneRole,
+    envSubdomain: `${getOrGenerateSubdomainName()}.dev`,
+    crossAccountParentHostedZone: {
+      zoneId: devHostedZoneId,
+      roleArn: devCrossAccountZoneDelegationRoleArn,
+    },
   },
 ];

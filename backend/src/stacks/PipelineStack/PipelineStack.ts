@@ -39,9 +39,9 @@ export class PipelineStack extends Stack {
 
     const pipelineEnvNames = ['Production', 'Staging'] as const;
 
-    interface PipelineEnv extends AppEnvWithAWSEnv {
+    type PipelineEnv = AppEnvWithAWSEnv & {
       envName: typeof pipelineEnvNames[number];
-    }
+    };
 
     const pipelineEnvs = appEnvs.filter(({ envName }) =>
       pipelineEnvNames.includes(envName as PipelineEnv['envName'])

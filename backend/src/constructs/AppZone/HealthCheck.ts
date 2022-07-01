@@ -3,18 +3,20 @@ import { Construct } from 'constructs';
 
 import { CrossRegionMetricAlarm, CrossRegionSNSTopic } from '~/constructs';
 
-interface HealthChecksProps {
+interface HealthCheckProps {
   domainName: string;
   alarmEmails?: string[];
 }
 
-export class HealthChecks extends Construct {
+export class HealthCheck extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { domainName, alarmEmails }: HealthChecksProps
+    { domainName, alarmEmails }: HealthCheckProps
   ) {
     super(scope, id);
+
+    const route53MetricsRegion = 'us-east-1';
 
     const healthCheck = new CfnHealthCheck(this, 'HealthCheck', {
       healthCheckConfig: {
@@ -25,18 +27,14 @@ export class HealthChecks extends Construct {
       },
     });
 
-    // Route 53 metrics are not available if you select any other region (not US East).
-    // https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/monitoring-health-checks.html
-    const healthCheckRegion = 'us-east-1';
-
     const topic = new CrossRegionSNSTopic(this, 'Topic', {
-      region: healthCheckRegion,
+      region: route53MetricsRegion,
       createTopicInput: { Name: 'Route53HealthCheck' },
       subscribeInputs: alarmEmails?.map((Endpoint) => ({ Endpoint, Protocol: 'email' })),
     });
 
     new CrossRegionMetricAlarm(this, `Alarm`, {
-      region: healthCheckRegion,
+      region: route53MetricsRegion,
       putMetricAlarmInput: {
         AlarmName: 'Route53HealthCheck',
         Namespace: 'AWS/Route53',

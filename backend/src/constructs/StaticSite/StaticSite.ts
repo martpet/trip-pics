@@ -1,48 +1,43 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
-import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
+import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
-import { WebDistribution } from '~/constructs';
+import { WebDistribution } from './WebDistribution';
 
 interface StaticSiteProps {
   distPath: string;
   domainName: string;
-  hostedZone: IHostedZone;
   certificate: ICertificate;
+  hostedZone: IHostedZone;
 }
 
 export class StaticSite extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { distPath, domainName, hostedZone, certificate }: StaticSiteProps
+    { distPath, hostedZone, domainName, certificate }: StaticSiteProps
   ) {
     super(scope, id);
 
-    const destinationBucket = new Bucket(this, 'WebBucket', {
+    const bucket = new Bucket(this, 'WebBucket', {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
 
-    const { distribution } = new WebDistribution(this, 'Distribution', {
-      certificate,
+    const { distribution } = new WebDistribution(this, 'WebDistribution', {
+      bucket,
+      hostedZone,
       domainName,
-      destinationBucket,
+      certificate,
     });
 
-    new BucketDeployment(this, 'Deployment', {
+    new BucketDeployment(this, 'WebDeployment', {
       sources: [Source.asset(distPath)],
-      destinationBucket,
+      destinationBucket: bucket,
       distribution,
-    });
-
-    new ARecord(this, 'Alias', {
-      zone: hostedZone,
-      target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
   }
 }
