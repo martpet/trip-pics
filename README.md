@@ -8,8 +8,8 @@
 
 ----
 
-## *Personal* AWS environment
 
+## Personal AWS environment
 There are two options:
 
 Ask the administrator to create a new account for you under the *Dev* AWS Organizations unit.
@@ -46,7 +46,7 @@ AWS admin rights **not** required.
 
 ### Bootstrap
 
-For *Production* and *Staging* environments run with AWS admin rights:
+For Production and Staging environments run (with AWS admin rights):
 
 `cd backend && npx cdk bootstrap --profile aws-profile-name`
 
