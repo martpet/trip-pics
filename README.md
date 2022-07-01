@@ -136,10 +136,10 @@ Developers need permissions to assume the *CrossAccountDevHostedZone* role.
 There are two options:
 
 * Create a personal account in the *Dev* unit of AWS Organizations.
-* Add permissions for an external account in the *CrossAccountDevHostedZone* trust policy.
+* Add permissions for an external account in the *CrossAccountDevHostedZone* **trust policy**.
 
 <details>
-    <summary>Allowing an external account in CrossAccountDevHostedZone **trust policy**</summary>
+    <summary>Permissions for an external account in CrossAccountDevHostedZone trust policy</summary>
 
      {
         "Effect": "Allow",
