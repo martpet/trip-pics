@@ -10,28 +10,23 @@
 
 
 ## Personal AWS environment
-There are two options:
 
-Ask the administrator to create a new account for you under the *Dev* AWS Organizations unit.
+### Permissions
 
-Or ask the administrator to give permissions to an account of your choice.
+Eather ask the administrator to create a new account for you in the *Dev* AWS Organizations unit, or to give permissions to your own AWS account.
 
-### Choose a personal subdomain name
+### Choose a subdomain name
 
-The domain will be like *john*.dev.domain.com
+The full domain will look like *__john__.dev.domain.com*
 
 * Create a `.env.local` file in the repo root folder.
 * Copy the choosen name (*john*) to an env variable `PERSONAL_SUBDOMAIN` in *.env.local*.
 
 ### Bootstrap the AWS account
 
-AWS admin rights required.
-
 `cd backend && npx cdk bootstrap --profile aws-profile-name`
 
 ### Deploy
-
-AWS admin rights **not** required.
 
 `npm run deploy -- --profile aws-rofile-name --require-approval never`
 
@@ -46,7 +41,7 @@ AWS admin rights **not** required.
 
 ### Bootstrap
 
-For Production and Staging environments run (with AWS admin rights):
+For Production and Staging environments run:
 
 `cd backend && npx cdk bootstrap --profile aws-profile-name`
 
@@ -55,20 +50,20 @@ For Production and Staging environments run (with AWS admin rights):
 #### Create the hosted zones
 
 In the *Production* account:
-* Create a *root* public hosted with name `yourdomain.com`.
+* Create the *root* public hosted with name `yourdomain.com`.
 * Copy the *root* hosted zone id to a variable named `rootHostedZoneId` in *backend/consts/appConsts.ts*.
 
 In the *Staging* account:
-* Create a *test* public hosted zone with name `test.yourdomain.com`.
+* Create the *test* public hosted zone with name `test.yourdomain.com`.
 * Copy the *test* hosted zone id to a variable named `stagingHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *test* zone into the *Production* account *root* zone.
 
 In the *HostedZones* account:
-* Create a *dev* public hosted zone with name `dev.yourdomain.com`.
+* Create the *dev* public hosted zone with name `dev.yourdomain.com`.
 * Copy the *dev* hosted zone id to a variable named `devHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *dev* zone into the *Production* account *root* zone.
 
-#### Create policies for the hosted zones
+#### Create a policy
 
 In the *HostedZones* account create a policy named `DevHostedZoneChangeRecords`.
 
@@ -92,7 +87,7 @@ In the *HostedZones* account create a policy named `DevHostedZoneChangeRecords`.
     }
 </details>
 
-#### Create roles for the hosted zones policies
+#### Create a role
 
 In the *HostedZones* account create a role named `DevCrossAccountZoneDelegation`.
 
@@ -120,9 +115,9 @@ Add a custom trust policy:
     }
 </details>
 
-(Example of *aws:PrincipalOrgPaths*: `o-dqkaknenun/r-weph/ou-weph-n389l0xd`)
+(*PrincipalOrgPaths* is something like `o-dqkaknenun/r-weph/ou-weph-n389l0xd`)
 
-Select *DevHostedZoneChangeRecords* from the *Permissions policies* list.
+Choose *DevHostedZoneChangeRecords* from the *Permissions policies* list.
 
 Copy the ARN of *DevCrossAccountZoneDelegation* role to a variable named `devCrossAccountZoneDelegationRoleArn` in *backend/consts/appConsts.ts*.
 
@@ -144,7 +139,7 @@ There are two options:
 * Add permissions for an external account in the *CrossAccountDevHostedZone* trust policy.
 
 <details>
-    <summary>Allowing an external account in CrossAccountDevHostedZone trust policy</summary>
+    <summary>Allowing an external account in CrossAccountDevHostedZone **trust policy**</summary>
 
      {
         "Effect": "Allow",
