@@ -112,7 +112,7 @@ Add a custom trust policy:
                 "Action": "sts:AssumeRole",
                 "Condition": {
                     "ForAnyValue:StringLike": {
-                        "aws:PrincipalOrgPaths": "aws-organizations-path-to-Dev-or-NonDev-unit/*"
+                        "aws:PrincipalOrgPaths": "aws-organizations-path-to-dev-unit/*"
                     }
                 }
             }
@@ -120,9 +120,9 @@ Add a custom trust policy:
     }
 </details>
 
-Select *DevHostedZoneChangeRecords* from the *Permissions policies* list.
-
 (Example of *aws:PrincipalOrgPaths*: `o-dqkaknenun/r-weph/ou-weph-n389l0xd`)
+
+Select *DevHostedZoneChangeRecords* from the *Permissions policies* list.
 
 Copy the ARN of *DevCrossAccountZoneDelegation* role to a variable named `devCrossAccountZoneDelegationRoleArn` in *backend/consts/appConsts.ts*.
 
@@ -131,7 +131,7 @@ Copy the ARN of *DevCrossAccountZoneDelegation* role to a variable named `devCro
 In the *HostedZones* account:
 
 * Register a domain in Route53.
-* Use the name servers from the `root` zone NS record.
+* Use the name servers from the *root* zone NS record.
 * Copy the domain name to a variable named `rootDomain` in *backend/consts/appConsts.ts*
 
 ### Creating personal accounts for developers
@@ -153,4 +153,4 @@ There are two options:
         },
         "Action": "sts:AssumeRole"
     }
-<details>
+</details>
