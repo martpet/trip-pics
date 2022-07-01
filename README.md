@@ -13,7 +13,7 @@
 
 ### Permissions
 
-Eather ask the administrator to create a new account for you in the *Dev* AWS Organizations unit, or to give permissions to your own AWS account.
+Either ask the administrator to create a new account for you in the *Dev* AWS Organizations unit, or to give permissions to your own AWS account.
 
 ### Choose a subdomain name
 
@@ -36,7 +36,7 @@ The full domain will look like *__john__.dev.domain.com*
 
 ### Setup AWS Organizations
 * Create `Dev` and `NonDev` units.
-* Create `Production` and `Staging` accounts in the *Dev* unit.
+* Create `Production` and `Staging` accounts in the *NonDev* unit.
 * Create a `HostedZones` account in the *Root* unit.
 
 ### Bootstrap
@@ -50,7 +50,7 @@ For Production and Staging environments run:
 #### Create the hosted zones
 
 In the *Production* account:
-* Create the *root* public hosted with name `yourdomain.com`.
+* Create the *root* public hosted zone with name `yourdomain.com`.
 * Copy the *root* hosted zone id to a variable named `rootHostedZoneId` in *backend/consts/appConsts.ts*.
 
 In the *Staging* account:
