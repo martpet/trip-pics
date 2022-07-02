@@ -29,36 +29,30 @@ export class WebDistribution extends Construct {
   ) {
     super(scope, id);
 
-    const defaultRootObject = '/index.html';
+    const defaultBehavior = {
+      origin: new S3Origin(bucket),
+      viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      cachePolicy: new CachePolicy(this, 'CachePolicy', {
+        minTtl: Duration.days(365),
+      }),
+    };
 
-    // Without s3:ListBucket, CloudFront has no way of returning a 404 response to callers and instead returns HTTP 403 Forbidden.
-    // https://github.com/aws/aws-cdk/issues/13983
     const errorResponses = [
       {
         httpStatus: 403,
         responseHttpStatus: 200,
-        responsePagePath: defaultRootObject,
+        responsePagePath: '/index.html',
       },
       {
         httpStatus: 404,
         responseHttpStatus: 200,
-        responsePagePath: defaultRootObject,
+        responsePagePath: '/index.html',
       },
     ];
 
-    const cachePolicy = new CachePolicy(this, 'CachePolicy', {
-      minTtl: Duration.days(365),
-    });
-
-    const defaultBehavior = {
-      origin: new S3Origin(bucket),
-      viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      cachePolicy,
-    };
-
     const distribution = new Distribution(this, 'Distribution', {
       defaultBehavior,
-      defaultRootObject,
+      defaultRootObject: 'index.html',
       domainNames: [domainName],
       certificate,
       errorResponses,

@@ -46,6 +46,10 @@ export class AppZone extends Construct {
   ) {
     super(scope, id);
 
+    const domainName = envSubdomain ? `${envSubdomain}.${rootDomain}` : rootDomain;
+
+    let hostedZone: IHostedZone;
+
     if (!isProd && !envSubdomain) {
       throw new Error('Subdomain for Non-Production environments is required');
     }
@@ -53,10 +57,6 @@ export class AppZone extends Construct {
     if (isProd && envSubdomain) {
       throw new Error('Subdomain should not be added to Production environment');
     }
-
-    const domainName = envSubdomain ? `${envSubdomain}.${rootDomain}` : rootDomain;
-
-    let hostedZone: IHostedZone;
 
     if (hostedZoneId) {
       hostedZone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
