@@ -13,5 +13,5 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       AWS_ROLE_ARN: arn:aws:iam::766373560006:role/OrganizationAccountAccessRole
-      STACK: Production
+      ENV_NAME: Production
     secrets: inherit

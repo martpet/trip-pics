@@ -1,47 +1,35 @@
-import '~/App.css';
+import { oauthScopes } from '~/consts';
+import { getStackOutput } from '~/utils';
 
-import { useState } from 'react';
+// Todo: import authDomain directly from consts
+const { userPoolClientId, authDomain } = getStackOutput();
 
-import logo from '~/logo.svg';
+export function App() {
+  const authUrl = new URL(`https://${authDomain}/oauth2/authorize`);
+  const redirectUrl = `${window.location.protocol}//${window.location.host}`;
 
-function App() {
-  const [count, setCount] = useState(0);
+  authUrl.searchParams.append('response_type', 'token');
+  authUrl.searchParams.append('identity_provider', 'Google');
+  authUrl.searchParams.append('client_id', userPoolClientId);
+  authUrl.searchParams.append('redirect_uri', redirectUrl);
+  authUrl.searchParams.append('scope', oauthScopes.join(' '));
+
+  const [tokenEntry, tokenTypeEntry, tokenExpirationEntry] = window.location.hash
+    .substring(1)
+    .split('&');
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React</p>
-        <p>
-          <button type="button" onClick={() => setCount((state) => state + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
+    <>
+      <a href={authUrl.href}>click</a>
+      <br />
+      <br />
+      {tokenEntry}
+      <br />
+      <br />
+      {tokenTypeEntry}
+      <br />
+      <br />
+      {tokenExpirationEntry}
+    </>
   );
 }
-
-export default App;

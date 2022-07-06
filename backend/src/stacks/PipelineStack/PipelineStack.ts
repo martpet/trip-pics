@@ -1,30 +1,34 @@
-// Deploying with CodePipeline is not recommended.
-// Instead, GitHub Workflows works best.
-//
-// If you really want to deploy with CodePipeline:
-// 1. Create a connection in CodeStar to GitHub repo.
-// 2. Create a Personal Access Tokens in GitHub with scope "repo:status", and with any expiration date.
-// 3. Remove staging.yml and production.yml from GitHub workflows.
-// 4. Remove Production and Staging stacks from app.ts.
-// 5. In app.ts add:
-//
-// new PipelineStack(app, 'pipeline', {
-//   stackName: `${appName}-Pipeline`,
-//   env: {
-//     account: '791346621844',
-//     region,
-//   },
-// });
-//
-// 6. Push changes to "main" (staging env) and "prod" branches.
-// 7. Deploy pipeline stack: "npx cdk deploy pipeline --profile aws-profile"
+/**
+  This stack is not used anymore. Instead, GitHub Workflows is used.
+  If you want to deploy with CodePipeline:
+ 
+  1. Create a connection in CodeStar to the GitHub repo.
+  2. Add the connection ARN to the variable "connectionArn".
+  2. Create a Personal Access Tokens in GitHub with scope "repo:status", and with any expiration date.
+  3. Set the access token ARN to the variable 'gitTokenSsmArn'.
+  4. Remove staging.yml and production.yml from "backend/.github/workflows".
+  5. Remove the current stack in app.ts.
+  6. Add in app.ts:
+
+  new PipelineStack(app, stackName, {
+    stackName,
+    env: {
+      account: '791346621844',
+      region,
+    },
+  });
+
+  7. Push to "main" and "prod" branches.
+  8. Deploy pipeline stack with: "npx cdk deploy pipeline --profile aws-profile"
+*/
 
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 
+import packageJson from '~/../../package.json';
 import { AppPipeline, CodeBuildStatusToGit } from '~/constructs';
-import { appEnvs, AppEnvWithAWSEnv, appName, gitRepo } from '~/consts';
+import { appEnvs, gitRepo, stackName } from '~/consts';
+import { EnvName } from '~/types';
 
-import packageJson from '../../../../package.json';
 import { DeploymentStage } from './DeploymentStage';
 
 const connectionArn =
@@ -37,17 +41,9 @@ export class PipelineStack extends Stack {
   constructor(scope: App, id: string, props: StackProps) {
     super(scope, id, props);
 
-    const pipelineEnvNames = ['Production', 'Staging'] as const;
+    const pipelineEnvs: Array<Exclude<EnvName, 'Personal'>> = ['Production', 'Staging'];
 
-    type PipelineEnv = AppEnvWithAWSEnv & {
-      envName: typeof pipelineEnvNames[number];
-    };
-
-    const pipelineEnvs = appEnvs.filter(({ envName }) =>
-      pipelineEnvNames.includes(envName as PipelineEnv['envName'])
-    ) as PipelineEnv[];
-
-    pipelineEnvs.forEach(({ envName, env }) => {
+    pipelineEnvs.forEach((envName) => {
       const gitBranch = {
         Production: 'prod',
         Staging: 'main',
@@ -55,10 +51,10 @@ export class PipelineStack extends Stack {
 
       const { pipelineName } = new AppPipeline(this, `AppPipeline`, {
         envName,
-        env: env!,
+        env: appEnvs[envName].env!,
         gitBranch,
         DeploymentStage,
-        appName,
+        stackName,
         nodejs: packageJson.engines.node,
         repo: gitRepo,
         connectionArn,

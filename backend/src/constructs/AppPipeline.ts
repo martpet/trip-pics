@@ -10,7 +10,7 @@ export interface AppPipelineProps {
   repo: string;
   connectionArn: string;
   DeploymentStage: typeof Stage;
-  appName: string;
+  stackName: string;
   nodejs?: string;
   primaryOutputDirectory?: string;
 }
@@ -26,7 +26,7 @@ export class AppPipeline extends Construct {
       envName,
       env,
       DeploymentStage,
-      appName,
+      stackName,
       repo,
       connectionArn,
       nodejs,
@@ -62,7 +62,7 @@ export class AppPipeline extends Construct {
     this.pipelineName = codePipeline.pipeline.pipelineName;
 
     codePipeline.addStage(
-      new DeploymentStage(scope, `${appName}-${envName}`, {
+      new DeploymentStage(scope, `${stackName}-${envName}`, {
         env,
         envName,
       } as ConstructorParameters<typeof Stage>[2])

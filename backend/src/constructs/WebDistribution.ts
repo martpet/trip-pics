@@ -1,4 +1,4 @@
-import { Duration } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   CachePolicy,
@@ -9,12 +9,11 @@ import {
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
-import { IBucket } from 'aws-cdk-lib/aws-s3';
+import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct, IConstruct } from 'constructs';
 
 interface WebDistributionProps {
-  bucket: IBucket;
-  domainName: string;
+  appDomain: string;
   certificate: ICertificate;
   hostedZone: IHostedZone;
 }
@@ -22,12 +21,19 @@ interface WebDistributionProps {
 export class WebDistribution extends Construct {
   readonly distribution: IDistribution;
 
+  readonly bucket: IBucket;
+
   constructor(
     scope: IConstruct,
     id: string,
-    { bucket, domainName, certificate, hostedZone }: WebDistributionProps
+    { appDomain, certificate, hostedZone }: WebDistributionProps
   ) {
     super(scope, id);
+
+    const bucket = new Bucket(this, 'WebBucket', {
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+    });
 
     const defaultBehavior = {
       origin: new S3Origin(bucket),
@@ -53,7 +59,7 @@ export class WebDistribution extends Construct {
     const distribution = new Distribution(this, 'Distribution', {
       defaultBehavior,
       defaultRootObject: 'index.html',
-      domainNames: [domainName],
+      domainNames: [appDomain],
       certificate,
       errorResponses,
       enableLogging: true,
@@ -66,5 +72,6 @@ export class WebDistribution extends Construct {
     });
 
     this.distribution = distribution;
+    this.bucket = bucket;
   }
 }

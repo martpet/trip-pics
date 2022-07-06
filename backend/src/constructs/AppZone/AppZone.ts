@@ -28,7 +28,7 @@ interface AppZoneProps {
 export class AppZone extends Construct {
   readonly hostedZone: IHostedZone;
 
-  readonly domainName: string;
+  readonly appDomain: string;
 
   readonly certificate: ICertificate;
 
@@ -46,17 +46,16 @@ export class AppZone extends Construct {
   ) {
     super(scope, id);
 
-    const domainName = envSubdomain ? `${envSubdomain}.${rootDomain}` : rootDomain;
-
-    let hostedZone: IHostedZone;
-
     if (!isProd && !envSubdomain) {
-      throw new Error('Subdomain for Non-Production environments is required');
+      throw Error('Subdomain for Non-Production environments is required');
     }
 
     if (isProd && envSubdomain) {
-      throw new Error('Subdomain should not be added to Production environment');
+      throw Error('Subdomain should not be added to Production environment');
     }
+
+    const domainName = envSubdomain ? `${envSubdomain}.${rootDomain}` : rootDomain;
+    let hostedZone: IHostedZone;
 
     if (hostedZoneId) {
       hostedZone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
@@ -94,7 +93,7 @@ export class AppZone extends Construct {
       cleanupRoute53Records: true,
     });
 
-    this.domainName = domainName;
+    this.appDomain = domainName;
     this.certificate = certificate;
     this.hostedZone = hostedZone;
   }

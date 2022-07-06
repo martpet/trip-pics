@@ -1,7 +1,7 @@
 import { Environment } from 'aws-cdk-lib';
 
 import {
-  devCrossAccountZoneDelegationRoleArn,
+  devHostedZoneDelegationRoleArn,
   devHostedZoneId,
   healthCheckAlarmEmailsProd,
   healthCheckAlarmEmailsStaging,
@@ -15,7 +15,6 @@ import { EnvName } from '~/types';
 import { getOrGenerateSubdomainName } from '~/utils';
 
 export interface CommonAppEnvProps {
-  envName: EnvName;
   envSubdomain?: string;
   healthCheckAlarmEmails?: string[];
 }
@@ -39,9 +38,10 @@ export type AppEnvWithAWSEnv = AppEnv & {
   env?: Environment;
 };
 
-export const appEnvs: AppEnvWithAWSEnv[] = [
-  {
-    envName: 'Production',
+// Todo - export whole domains (devDomain, testDomain, authDomain) from common/consts/domains.
+// (so not to import authDomain from stack outputs)
+export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
+  Production: {
     healthCheckAlarmEmails: healthCheckAlarmEmailsProd,
     hostedZoneId: rootHostedZoneId,
     env: {
@@ -49,8 +49,7 @@ export const appEnvs: AppEnvWithAWSEnv[] = [
       region,
     },
   },
-  {
-    envName: 'Staging',
+  Staging: {
     envSubdomain: 'test',
     healthCheckAlarmEmails: healthCheckAlarmEmailsStaging,
     hostedZoneId: stagingHostedZoneId,
@@ -59,12 +58,11 @@ export const appEnvs: AppEnvWithAWSEnv[] = [
       region,
     },
   },
-  {
-    envName: 'Personal',
+  Personal: {
     envSubdomain: `${getOrGenerateSubdomainName()}.dev`,
     crossAccountParentHostedZone: {
       zoneId: devHostedZoneId,
-      roleArn: devCrossAccountZoneDelegationRoleArn,
+      roleArn: devHostedZoneDelegationRoleArn,
     },
   },
-];
+};

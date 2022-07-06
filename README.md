@@ -1,47 +1,47 @@
 # TripPics
 
-## Install
+To start developing you need a personal AWS account.
+
+## Development setup
+
+Ask the administrator for an AWS account.
+
+### Bootstrap your AWS account for CDK
+
+If not previously done.
+
+`npx cdk bootstrap --profile your-aws-profile`
+
+### Choose a subdomain for your dev environment
+
+The full domain will look like *__someName__.dev.domain.com*
+
+* Create a `.env.local` file in the repo root folder.
+* In *.env.local* write the choosen name (*someName*) to an env variable `PERSONAL_SUBDOMAIN`.
+
+### Install dependencies
+
 `npm install`
 
-## Start frontend
+### Deploy to your account
+
+`npm run deploy -- --profile your-aws-profile`
+
+### Start frontend server
+
 `npm start`
 
 ----
 
-
-## Personal AWS environment
-
-### Permissions
-
-Either ask the administrator to create a new account for you in the *Dev* AWS Organizations unit, or to give permissions to your own AWS account.
-
-### Choose a subdomain name
-
-The full domain will look like *__john__.dev.domain.com*
-
-* Create a `.env.local` file in the repo root folder.
-* Copy the choosen name (*john*) to an env variable `PERSONAL_SUBDOMAIN` in *.env.local*.
-
-### Bootstrap the AWS account
-
-`cd backend && npx cdk bootstrap --profile aws-profile-name`
-
-### Deploy
-
-`npm run deploy -- --profile aws-rofile-name --require-approval never`
-
-----
-
-## *Production*, *Staging* and *HostedZones* AWS environments
+## *Production*, *Staging* and *DevSevice* accounts
 
 ### Setup AWS Organizations
-* Create `Dev` and `NonDev` units.
-* Create `Production` and `Staging` accounts in the *NonDev* unit.
-* Create a `HostedZones` account in the *Root* unit.
+* Create `Production`, `Staging` and `DevService` accounts.
+* Create `Dev` unit.
 
 ### Bootstrap
 
-For Production and Staging environments run:
+For *Production* and *Staging* environments run:
 
 `cd backend && npx cdk bootstrap --profile aws-profile-name`
 
@@ -58,14 +58,14 @@ In the *Staging* account:
 * Copy the *test* hosted zone id to a variable named `stagingHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *test* zone into the *Production* account *root* zone.
 
-In the *HostedZones* account:
+In the *DevService* account:
 * Create the *dev* public hosted zone with name `dev.yourdomain.com`.
 * Copy the *dev* hosted zone id to a variable named `devHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *dev* zone into the *Production* account *root* zone.
 
 #### Create a policy
 
-In the *HostedZones* account create a policy named `DevHostedZoneChangeRecords`.
+In the *DevService* account create a policy named `HostedZoneChangeRecords`.
 
 <details>
     <summary>Policy content</summary>
@@ -76,7 +76,7 @@ In the *HostedZones* account create a policy named `DevHostedZoneChangeRecords`.
             {
                 "Effect": "Allow",
                 "Action": "route53:ChangeResourceRecordSets",
-                "Resource": "arn:aws:route53:::hostedzone/dev-hosted-zone-id"
+                "Resource": "arn:aws:route53:::hostedzone/DEV_HOSTED_ZONE_ID"
             },
             {
                 "Effect": "Allow",
@@ -89,7 +89,7 @@ In the *HostedZones* account create a policy named `DevHostedZoneChangeRecords`.
 
 #### Create a role
 
-In the *HostedZones* account create a role named `DevCrossAccountZoneDelegation`.
+In the *DevService* account create a role named `ZoneDelegation`.
 
 Add a custom trust policy:
 
@@ -107,7 +107,7 @@ Add a custom trust policy:
                 "Action": "sts:AssumeRole",
                 "Condition": {
                     "ForAnyValue:StringLike": {
-                        "aws:PrincipalOrgPaths": "aws-organizations-path-to-dev-unit/*"
+                        "aws:PrincipalOrgPaths": "ORGANIZATIONS_PATH_TO_DEV_UNIT/*"
                     }
                 }
             }
@@ -117,9 +117,9 @@ Add a custom trust policy:
 
 (*PrincipalOrgPaths* is something like `o-dqkaknenun/r-weph/ou-weph-n389l0xd`)
 
-Choose *DevHostedZoneChangeRecords* from the *Permissions policies* list.
+Choose *HostedZoneChangeRecords* from the *Permissions policies* list.
 
-Copy the ARN of *DevCrossAccountZoneDelegation* role to a variable named `devCrossAccountZoneDelegationRoleArn` in *backend/consts/appConsts.ts*.
+Copy the ARN of *ZoneDelegation* role to a variable named `devHostedZoneDelegationRoleArn` in *backend/consts/appConsts.ts*.
 
 #### Register a domain
 
@@ -131,20 +131,20 @@ In the *HostedZones* account:
 
 ### Creating personal accounts for developers
 
-Developers need permissions to assume the *CrossAccountDevHostedZone* role.
+Developers need permissions to assume the *ZoneDelegation* role in the *DevService* account.
 
 There are two options:
 
-* Create a personal account in the *Dev* unit of AWS Organizations.
-* Add permissions for an external account in the *CrossAccountDevHostedZone* **trust policy**.
+* Create new personal accounts for developers in the *Dev* unit.
+* Add permissions for existing accounts to the the *ZoneDelegation* role's **trust policy**.
 
 <details>
-    <summary>Permissions for an external account in CrossAccountDevHostedZone trust policy</summary>
+    <summary>Permissions for an existing account in ZoneDelegation trust policy</summary>
 
      {
         "Effect": "Allow",
         "Principal": {
-            "AWS": "external-account-id"
+            "AWS": "ACCOUNT_ID"
         },
         "Action": "sts:AssumeRole"
     }

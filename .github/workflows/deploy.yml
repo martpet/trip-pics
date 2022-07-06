@@ -4,7 +4,7 @@ on:
       AWS_ROLE_ARN:
         required: true
         type: string
-      STACK:
+      ENV_NAME:
         required: true
         type: string
 
@@ -25,7 +25,7 @@ jobs:
         run: npm ci -f
 
       - name: Build frontend
-        run: npm run build:frontend
+        run: npm run build
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -41,8 +41,7 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
-          cdk_version: '2.29.1'
+          cdk_version: '2.30.0'
           working_dir: 'backend'
-          cdk_stack: ${{ inputs.STACK }}
-          cdk_args: '--require-approval never'
+          cdk_args: '--require-approval never --context envName=${{ inputs.ENV_NAME }}'
           actions_comment: false

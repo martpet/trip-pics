@@ -16,5 +16,5 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       AWS_ROLE_ARN: arn:aws:iam::204115048155:role/OrganizationAccountAccessRole
-      STACK: Staging
+      ENV_NAME: Staging
     secrets: inherit

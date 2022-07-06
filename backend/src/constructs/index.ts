@@ -3,4 +3,5 @@ export * from './AppZone';
 export * from './CodeBuildStatusToGit';
 export * from './CrossRegionMetricAlarm';
 export * from './CrossRegionSNSTopic';
-export * from './StaticSite';
+export * from './WebDeployment';
+export * from './Auth';

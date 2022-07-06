@@ -9,6 +9,7 @@
   "include": [
     "src",
     "vite.config.ts",
-    ".eslintrc.js"
+    ".eslintrc.js",
+    "public/stack-output.js"
   ]
 }
