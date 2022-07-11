@@ -13,7 +13,7 @@ import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct, IConstruct } from 'constructs';
 
 interface WebDistributionProps {
-  appDomain: string;
+  envDomain: string;
   certificate: ICertificate;
   hostedZone: IHostedZone;
 }
@@ -26,7 +26,7 @@ export class WebDistribution extends Construct {
   constructor(
     scope: IConstruct,
     id: string,
-    { appDomain, certificate, hostedZone }: WebDistributionProps
+    { envDomain, certificate, hostedZone }: WebDistributionProps
   ) {
     super(scope, id);
 
@@ -59,7 +59,7 @@ export class WebDistribution extends Construct {
     const distribution = new Distribution(this, 'Distribution', {
       defaultBehavior,
       defaultRootObject: 'index.html',
-      domainNames: [appDomain],
+      domainNames: [envDomain],
       certificate,
       errorResponses,
       enableLogging: true,

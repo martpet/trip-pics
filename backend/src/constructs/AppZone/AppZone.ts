@@ -14,9 +14,7 @@ import { Construct } from 'constructs';
 import { HealthCheck } from './HealthCheck';
 
 interface AppZoneProps {
-  isProd: boolean;
-  rootDomain: string;
-  envSubdomain?: string;
+  envDomain: string;
   hostedZoneId?: string;
   healthCheckAlarmEmails?: string[];
   crossAccountParentHostedZone?: {
@@ -28,17 +26,13 @@ interface AppZoneProps {
 export class AppZone extends Construct {
   readonly hostedZone: IHostedZone;
 
-  readonly appDomain: string;
-
   readonly certificate: ICertificate;
 
   constructor(
     scope: Construct,
     id: string,
     {
-      isProd,
-      rootDomain,
-      envSubdomain,
+      envDomain,
       hostedZoneId,
       crossAccountParentHostedZone,
       healthCheckAlarmEmails,
@@ -46,25 +40,16 @@ export class AppZone extends Construct {
   ) {
     super(scope, id);
 
-    if (!isProd && !envSubdomain) {
-      throw Error('Subdomain for Non-Production environments is required');
-    }
-
-    if (isProd && envSubdomain) {
-      throw Error('Subdomain should not be added to Production environment');
-    }
-
-    const domainName = envSubdomain ? `${envSubdomain}.${rootDomain}` : rootDomain;
     let hostedZone: IHostedZone;
 
     if (hostedZoneId) {
       hostedZone = PublicHostedZone.fromPublicHostedZoneAttributes(this, 'HostedZone', {
         hostedZoneId,
-        zoneName: domainName,
+        zoneName: envDomain,
       });
     } else {
       hostedZone = new PublicHostedZone(this, 'HostedZone', {
-        zoneName: domainName,
+        zoneName: envDomain,
       });
     }
 
@@ -81,19 +66,18 @@ export class AppZone extends Construct {
     }
 
     new HealthCheck(this, 'HealthChecks', {
-      domainName,
+      domainName: envDomain,
       alarmEmails: healthCheckAlarmEmails,
     });
 
     const certificate = new DnsValidatedCertificate(this, 'Certificate', {
       hostedZone,
-      domainName,
-      subjectAlternativeNames: [`*.${domainName}`],
+      domainName: envDomain,
+      subjectAlternativeNames: [`*.${envDomain}`],
       region: 'us-east-1', // us-east-1 needed by CloudFront
       cleanupRoute53Records: true,
     });
 
-    this.appDomain = domainName;
     this.certificate = certificate;
     this.hostedZone = hostedZone;
   }

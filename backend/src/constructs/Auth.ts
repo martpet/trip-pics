@@ -12,7 +12,7 @@ import { UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
 
 interface AuthProps {
-  appDomain: string;
+  envDomain: string;
   authSubdomain: string;
   certificate: ICertificate;
   hostedZone: IHostedZone;
@@ -22,16 +22,16 @@ interface AuthProps {
 export class Auth extends Construct {
   readonly userPoolClientId: string;
 
-  readonly domainName: string;
+  readonly authDomain: string;
 
   constructor(
     scope: Construct,
     id: string,
-    { appDomain, authSubdomain, certificate, hostedZone, oauthScopes }: AuthProps
+    { envDomain, authSubdomain, certificate, hostedZone, oauthScopes }: AuthProps
   ) {
     super(scope, id);
 
-    this.domainName = `${authSubdomain}.${appDomain}`;
+    const authDomain = `${authSubdomain}.${envDomain}`;
 
     // TODO - move to secrets
     const clientId =
@@ -44,7 +44,7 @@ export class Auth extends Construct {
 
     const userPoolDomain = userPool.addDomain('CognitoDomain', {
       customDomain: {
-        domainName: this.domainName,
+        domainName: authDomain,
         certificate,
       },
     });
@@ -72,12 +72,13 @@ export class Auth extends Construct {
       userPool,
       supportedIdentityProviders: [UserPoolClientIdentityProvider.GOOGLE],
       oAuth: {
-        callbackUrls: [`https://${appDomain}`, 'http://localhost:3000'],
+        callbackUrls: [`https://${envDomain}`, 'http://localhost:3000'],
       },
     });
 
     client.node.addDependency(identityProvider);
 
     this.userPoolClientId = client.userPoolClientId;
+    this.authDomain = authDomain;
   }
 }

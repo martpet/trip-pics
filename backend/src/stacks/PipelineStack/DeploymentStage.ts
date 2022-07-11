@@ -3,21 +3,15 @@ import { Construct } from 'constructs';
 
 import { AppEnv } from '~/consts';
 import { AppStack } from '~/stacks';
-import { EnvName } from '~/types';
 
 interface DeploymentStageProps extends StageProps {
   appEnv: AppEnv;
-  envName: EnvName;
 }
 
 export class DeploymentStage extends Stage {
-  constructor(
-    scope: Construct,
-    id: string,
-    { appEnv, envName, ...props }: DeploymentStageProps
-  ) {
+  constructor(scope: Construct, id: string, { appEnv, ...props }: DeploymentStageProps) {
     super(scope, id, props);
 
-    new AppStack(this, 'App', { appEnv, envName });
+    new AppStack(this, 'App', { appEnv });
   }
 }

@@ -3,35 +3,26 @@ import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { AppZone, Auth, WebDeployment, WebDistribution } from '~/constructs';
-import { AppEnv, authSubdomain, oauthScopes, rootDomain } from '~/consts';
-import { EnvName, StackOutput } from '~/types';
+import { AppEnv, authSubdomain, oauthScopes } from '~/consts';
+import { StackOutput } from '~/types';
 
 interface AppStackProps extends StackProps {
   appEnv: AppEnv;
-  envName: EnvName;
 }
 
 export class AppStack extends Stack {
-  constructor(
-    scope: Construct,
-    id: string,
-    { appEnv, envName, ...props }: AppStackProps
-  ) {
+  constructor(scope: Construct, id: string, { appEnv, ...props }: AppStackProps) {
     super(scope, id, props);
 
     const {
-      envSubdomain,
+      envDomain,
       healthCheckAlarmEmails,
       hostedZoneId,
       crossAccountParentHostedZone,
     } = appEnv;
 
-    const isProd = envName === 'Production';
-
-    const { appDomain, hostedZone, certificate } = new AppZone(this, 'AppZone', {
-      isProd,
-      rootDomain,
-      envSubdomain,
+    const { hostedZone, certificate } = new AppZone(this, 'AppZone', {
+      envDomain,
       hostedZoneId,
       crossAccountParentHostedZone,
       healthCheckAlarmEmails,
@@ -39,12 +30,12 @@ export class AppStack extends Stack {
 
     const cdn = new WebDistribution(this, 'WebDistribution', {
       hostedZone,
-      appDomain,
+      envDomain,
       certificate,
     });
 
     const auth = new Auth(this, 'Auth', {
-      appDomain,
+      envDomain,
       authSubdomain,
       hostedZone,
       certificate,
@@ -55,8 +46,7 @@ export class AppStack extends Stack {
 
     const stackOutput: StackOutput = {
       userPoolClientId: auth.userPoolClientId,
-      // Todo: remove authDomain from outputs
-      authDomain: auth.domainName,
+      authDomain: auth.authDomain,
     };
 
     new WebDeployment(this, 'ReactApp', {

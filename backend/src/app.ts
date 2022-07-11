@@ -15,7 +15,6 @@ const { env, ...appEnv } = appEnvs[envName];
 
 new AppStack(app, stackName, {
   stackName,
-  envName,
   appEnv,
   env,
 });

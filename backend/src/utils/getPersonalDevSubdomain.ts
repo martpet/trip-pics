@@ -2,7 +2,7 @@ import { resolve } from 'app-root-path';
 import { appendFileSync } from 'fs';
 import { userInfo } from 'os';
 
-export const getOrGenerateSubdomainName = () => {
+export const getPersonalDevSubdomain = () => {
   const envKey = 'PERSONAL_SUBDOMAIN';
   let subdomain = process.env[envKey];
 

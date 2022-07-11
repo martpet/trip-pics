@@ -59,13 +59,9 @@ export class AppPipeline extends Construct {
       synthCodeBuildDefaults,
     });
 
-    this.pipelineName = codePipeline.pipeline.pipelineName;
+    const stage = new DeploymentStage(scope, `${stackName}-${envName}`, { env });
+    codePipeline.addStage(stage);
 
-    codePipeline.addStage(
-      new DeploymentStage(scope, `${stackName}-${envName}`, {
-        env,
-        envName,
-      } as ConstructorParameters<typeof Stage>[2])
-    );
+    this.pipelineName = codePipeline.pipeline.pipelineName;
   }
 }

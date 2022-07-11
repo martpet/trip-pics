@@ -7,15 +7,16 @@ import {
   healthCheckAlarmEmailsStaging,
   prodAccountId,
   region,
+  rootDomain,
   rootHostedZoneId,
   stagingAccountId,
   stagingHostedZoneId,
 } from '~/consts';
 import { EnvName } from '~/types';
-import { getOrGenerateSubdomainName } from '~/utils';
+import { getPersonalDevSubdomain } from '~/utils';
 
 export interface CommonAppEnvProps {
-  envSubdomain?: string;
+  envDomain: string;
   healthCheckAlarmEmails?: string[];
 }
 
@@ -38,10 +39,9 @@ export type AppEnvWithAWSEnv = AppEnv & {
   env?: Environment;
 };
 
-// Todo - export whole domains (devDomain, testDomain, authDomain) from common/consts/domains.
-// (so not to import authDomain from stack outputs)
 export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
   Production: {
+    envDomain: rootDomain,
     healthCheckAlarmEmails: healthCheckAlarmEmailsProd,
     hostedZoneId: rootHostedZoneId,
     env: {
@@ -50,7 +50,7 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
     },
   },
   Staging: {
-    envSubdomain: 'test',
+    envDomain: `test.${rootDomain}`,
     healthCheckAlarmEmails: healthCheckAlarmEmailsStaging,
     hostedZoneId: stagingHostedZoneId,
     env: {
@@ -59,7 +59,7 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
     },
   },
   Personal: {
-    envSubdomain: `${getOrGenerateSubdomainName()}.dev`,
+    envDomain: `${getPersonalDevSubdomain()}.dev.${rootDomain}`,
     crossAccountParentHostedZone: {
       zoneId: devHostedZoneId,
       roleArn: devHostedZoneDelegationRoleArn,
