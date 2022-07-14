@@ -21,7 +21,7 @@ The full domain will look like *__chosen-name__.dev.domain.com*
 
 ### Install dependencies
 
-`npm install`
+`npm install -f`
 
 ### Deploy to your personal account
 
