@@ -18,6 +18,7 @@ export function App() {
   return (
     <>
       <a href={authUrl.href}>click</a>
+      <br />
       {tokenEntry}
     </>
   );

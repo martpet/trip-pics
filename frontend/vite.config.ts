@@ -12,6 +12,7 @@ export default defineConfig({
   build: {
     outDir: './dist',
     cssCodeSplit: false,
+    target: 'esnext',
   },
   envDir: '../',
 });

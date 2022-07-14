@@ -16,7 +16,7 @@
     "test:backend": "jest --config=backend/jest.config.ts",
     "build": "vite build frontend",
     "synth": "cd backend && npx cdk synth --context envName=Personal",
-    "deploy": "npm run build && cd backend && npx cdk deploy --context envName=Personal --outputs-file ../common/stack-output.json",
+    "deploy": "npm run build && cd backend && npx cdk deploy --context envName=Personal --outputs-file ../frontend/public/stack-output.json",
     "destroy": "cd backend && npx cdk destroy",
     "prepare": "husky install"
   },
