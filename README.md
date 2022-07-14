@@ -1,5 +1,7 @@
 # TripPics
 
+This is a playground for learning AWS CDK.
+
 (work in progress)
 
 ## Setup development environment

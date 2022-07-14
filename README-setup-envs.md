@@ -2,7 +2,7 @@
 
 ## Setup AWS Organizations
 * Create `Production`, `Staging` and `DevService` accounts.
-* Create `Dev` unit.
+* Create a `Dev` unit.
 
 ## Bootstrap
 
@@ -15,20 +15,20 @@ For *Production* and *Staging* environments run:
 ### Create the hosted zones
 
 In the *Production* account:
-* Create the *root* public hosted zone with name `yourdomain.com`.
+* Create the *root* public hosted zone with name `<domain.com>`.
 * Copy the *root* hosted zone id to a variable named `rootHostedZoneId` in *backend/consts/appConsts.ts*.
 
 In the *Staging* account:
-* Create the *test* public hosted zone with name `test.yourdomain.com`.
+* Create the *test* public hosted zone with name `test.domain.com`.
 * Copy the *test* hosted zone id to a variable named `stagingHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *test* zone into the *Production* account *root* zone.
 
 In the *DevService* account:
-* Create the *dev* public hosted zone with name `dev.yourdomain.com`.
+* Create the *dev* public hosted zone with name `dev.domain.com`.
 * Copy the *dev* hosted zone id to a variable named `devHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *dev* zone into the *Production* account *root* zone.
 
-### Create a policy for changing records
+### Create a policy for editing the *Dev* hosted zone records
 
 In the *DevService* account create a policy named `HostedZoneChangeRecords`.
 
@@ -94,7 +94,7 @@ In the *DevService* account add a policy named `SSMGetOauthClientSecret`.
     }
 </details>
 
-## Add a role to be assumed by the personal dev accounts
+## Add a role to be assumed by the dev accounts
 
 In the *DevService* account create a role named `DevAccountServiceRole`.
 
