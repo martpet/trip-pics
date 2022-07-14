@@ -1,4 +1,4 @@
-import { RemovalPolicy } from 'aws-cdk-lib';
+import { Fn, RemovalPolicy, SecretValue } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   ProviderAttribute,
@@ -11,12 +11,17 @@ import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
 
+import { CrossAccountSSM } from '~/constructs';
+
 interface AuthProps {
   envDomain: string;
   authSubdomain: string;
   certificate: ICertificate;
   hostedZone: IHostedZone;
   oauthScopes: string[];
+  googleClientId: string;
+  googleClientSecretParamName: string;
+  oauthSecretsAssumeRoleArn?: string;
 }
 
 export class Auth extends Construct {
@@ -27,48 +32,68 @@ export class Auth extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { envDomain, authSubdomain, certificate, hostedZone, oauthScopes }: AuthProps
+    {
+      envDomain,
+      authSubdomain,
+      certificate,
+      hostedZone,
+      oauthScopes,
+      googleClientId,
+      googleClientSecretParamName,
+      oauthSecretsAssumeRoleArn,
+    }: AuthProps
   ) {
     super(scope, id);
 
-    const authDomain = `${authSubdomain}.${envDomain}`;
+    this.authDomain = `${authSubdomain}.${envDomain}`;
 
-    // TODO - move to secrets
-    const clientId =
-      '276806659709-6lap8v4ekmsqqrdaosb3tmiq6j24fvgv.apps.googleusercontent.com';
-    const clientSecret = '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';
-
-    const userPool = new UserPool(this, 'Pool', {
+    const userPool = new UserPool(this, 'UserPool', {
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
-    const userPoolDomain = userPool.addDomain('CognitoDomain', {
+    const userPoolDomain = userPool.addDomain('UserPoolDomain', {
       customDomain: {
-        domainName: authDomain,
+        domainName: this.authDomain,
         certificate,
       },
     });
 
-    new ARecord(this, 'CognitoAliasRecord', {
+    new ARecord(this, 'ARecord', {
       zone: hostedZone,
       recordName: authSubdomain,
       target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
     });
 
-    const identityProvider = new UserPoolIdentityProviderGoogle(this, 'GoogleProvider', {
-      clientId,
-      clientSecret,
-      scopes: oauthScopes,
-      userPool,
-      attributeMapping: {
-        email: ProviderAttribute.GOOGLE_EMAIL,
-        custom: {
-          picture: ProviderAttribute.GOOGLE_PICTURE,
-        },
-      },
-    });
+    let googleSecret: string;
 
-    const client = new UserPoolClient(this, 'GooglePoolClient', {
+    if (oauthSecretsAssumeRoleArn) {
+      const { values } = new CrossAccountSSM(this, 'OAuthSecrets', {
+        roleArn: oauthSecretsAssumeRoleArn,
+        getParametersInput: { Names: [googleClientSecretParamName] },
+      });
+      googleSecret = Fn.select(0, values);
+    } else {
+      googleSecret = SecretValue.ssmSecure(googleClientSecretParamName).toString();
+    }
+
+    const googleIdentityProvider = new UserPoolIdentityProviderGoogle(
+      this,
+      'GoogleIdentityProvider',
+      {
+        userPool,
+        clientId: googleClientId,
+        clientSecret: googleSecret,
+        scopes: oauthScopes,
+        attributeMapping: {
+          email: ProviderAttribute.GOOGLE_EMAIL,
+          custom: {
+            picture: ProviderAttribute.GOOGLE_PICTURE,
+          },
+        },
+      }
+    );
+
+    const client = new UserPoolClient(this, 'UserPoolClient', {
       userPool,
       supportedIdentityProviders: [UserPoolClientIdentityProvider.GOOGLE],
       oAuth: {
@@ -76,9 +101,8 @@ export class Auth extends Construct {
       },
     });
 
-    client.node.addDependency(identityProvider);
+    client.node.addDependency(googleIdentityProvider);
 
     this.userPoolClientId = client.userPoolClientId;
-    this.authDomain = authDomain;
   }
 }

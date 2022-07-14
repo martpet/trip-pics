@@ -17,8 +17,9 @@ export interface CrossRegionSNSTopicHandlerProps {
 }
 
 export const handler = async (event: CloudFormationCustomResourceEvent) => {
-  const props = event.ResourceProperties as unknown as CrossRegionSNSTopicHandlerProps;
-  const { region, createTopicInput, subscribeInputs } = props;
+  const { region, createTopicInput, subscribeInputs } =
+    event.ResourceProperties as unknown as CrossRegionSNSTopicHandlerProps;
+
   const client = new SNSClient({ region });
 
   if (event.RequestType === 'Delete') {

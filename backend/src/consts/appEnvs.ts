@@ -1,8 +1,11 @@
 import { Environment } from 'aws-cdk-lib';
 
 import {
-  devHostedZoneDelegationRoleArn,
+  devAccountServiceRoleArn,
   devHostedZoneId,
+  googleClientIdDev,
+  googleClientIdProd,
+  googleClientIdStaging,
   healthCheckAlarmEmailsProd,
   healthCheckAlarmEmailsStaging,
   prodAccountId,
@@ -15,35 +18,33 @@ import {
 import { EnvName } from '~/types';
 import { getPersonalDevSubdomain } from '~/utils';
 
-export interface CommonAppEnvProps {
+export interface CommonProps {
   envDomain: string;
   healthCheckAlarmEmails?: string[];
+  googleClientId: string;
+  oauthSecretsAssumeRoleArn?: string;
 }
 
-interface WithExistingHostedZone extends CommonAppEnvProps {
-  hostedZoneId: string;
-  crossAccountParentHostedZone?: never;
-}
-
-interface WithoutExistingHostedZone extends CommonAppEnvProps {
+interface WithParentHostedZone {
+  parentHostedZoneId: string;
   hostedZoneId?: never;
-  crossAccountParentHostedZone: {
-    zoneId: string;
-    roleArn: string;
-  };
 }
 
-export type AppEnv = WithExistingHostedZone | WithoutExistingHostedZone;
+interface WithoutParentHostedZone {
+  parentHostedZoneId?: never;
+  hostedZoneId: string;
+}
 
-export type AppEnvWithAWSEnv = AppEnv & {
-  env?: Environment;
-};
+export type AppEnv = CommonProps & (WithParentHostedZone | WithoutParentHostedZone);
+
+export type AppEnvWithAWSEnv = AppEnv & { env?: Environment };
 
 export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
   Production: {
     envDomain: rootDomain,
     healthCheckAlarmEmails: healthCheckAlarmEmailsProd,
     hostedZoneId: rootHostedZoneId,
+    googleClientId: googleClientIdProd,
     env: {
       account: prodAccountId,
       region,
@@ -53,6 +54,7 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
     envDomain: `test.${rootDomain}`,
     healthCheckAlarmEmails: healthCheckAlarmEmailsStaging,
     hostedZoneId: stagingHostedZoneId,
+    googleClientId: googleClientIdStaging,
     env: {
       account: stagingAccountId,
       region,
@@ -60,9 +62,8 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
   },
   Personal: {
     envDomain: `${getPersonalDevSubdomain()}.dev.${rootDomain}`,
-    crossAccountParentHostedZone: {
-      zoneId: devHostedZoneId,
-      roleArn: devHostedZoneDelegationRoleArn,
-    },
+    parentHostedZoneId: devHostedZoneId,
+    googleClientId: googleClientIdDev,
+    oauthSecretsAssumeRoleArn: devAccountServiceRoleArn,
   },
 };

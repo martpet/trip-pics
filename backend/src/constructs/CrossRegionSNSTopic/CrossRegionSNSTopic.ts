@@ -6,18 +6,20 @@ import { Construct } from 'constructs';
 
 import { CrossRegionSNSTopicHandlerProps } from './CrossRegionSNSTopic.handler';
 
-type CrossRegionSNSTopicProps = CrossRegionSNSTopicHandlerProps;
-
 export class CrossRegionSNSTopic extends Construct {
   readonly arn: string;
 
-  constructor(scope: Construct, id: string, props: CrossRegionSNSTopicProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    handlerProps: CrossRegionSNSTopicHandlerProps
+  ) {
     super(scope, id);
 
     const { stackName } = Stack.of(this);
 
     // eslint-disable-next-line no-param-reassign
-    props.createTopicInput.Name = `${stackName}-${props.createTopicInput.Name}`;
+    handlerProps.createTopicInput.Name = `${stackName}-${handlerProps.createTopicInput.Name}`;
 
     const onEventHandler = new NodejsFunction(this, 'handler');
 
@@ -30,11 +32,11 @@ export class CrossRegionSNSTopic extends Construct {
 
     const provider = new Provider(this, 'Provider', { onEventHandler });
 
-    const topic = new CustomResource(this, 'CrossRegionSNSTopic', {
+    const customResource = new CustomResource(this, 'CrossRegionSNSTopic', {
       serviceToken: provider.serviceToken,
-      properties: props,
+      properties: handlerProps,
     });
 
-    this.arn = topic.getAttString('TopicArn');
+    this.arn = customResource.getAttString('TopicArn');
   }
 }

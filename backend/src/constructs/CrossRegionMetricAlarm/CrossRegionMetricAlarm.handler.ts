@@ -14,8 +14,9 @@ export interface CrossRegionAlarmHandlerProps {
 }
 
 export const handler = async (event: CloudFormationCustomResourceEvent) => {
-  const props = event.ResourceProperties as unknown as CrossRegionAlarmHandlerProps;
-  const { region, putMetricAlarmInput } = props;
+  const { region, putMetricAlarmInput } =
+    event.ResourceProperties as unknown as CrossRegionAlarmHandlerProps;
+
   const { AlarmName } = putMetricAlarmInput;
   const client = new CloudWatchClient({ region });
 

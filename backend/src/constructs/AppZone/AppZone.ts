@@ -16,11 +16,9 @@ import { HealthCheck } from './HealthCheck';
 interface AppZoneProps {
   envDomain: string;
   hostedZoneId?: string;
+  parentHostedZoneId?: string;
+  delegationRoleArn?: string;
   healthCheckAlarmEmails?: string[];
-  crossAccountParentHostedZone?: {
-    zoneId: string;
-    roleArn: string;
-  };
 }
 
 export class AppZone extends Construct {
@@ -34,7 +32,8 @@ export class AppZone extends Construct {
     {
       envDomain,
       hostedZoneId,
-      crossAccountParentHostedZone,
+      parentHostedZoneId,
+      delegationRoleArn,
       healthCheckAlarmEmails,
     }: AppZoneProps
   ) {
@@ -53,14 +52,12 @@ export class AppZone extends Construct {
       });
     }
 
-    if (crossAccountParentHostedZone) {
-      const { zoneId, roleArn } = crossAccountParentHostedZone;
-      const delegationRole = Role.fromRoleArn(this, 'DelegationRole', roleArn);
-
+    if (parentHostedZoneId && delegationRoleArn) {
+      const delegationRole = Role.fromRoleArn(this, 'DelegationRole', delegationRoleArn);
       new CrossAccountZoneDelegationRecord(this, 'ZoneDelegation', {
         delegationRole,
         delegatedZone: hostedZone,
-        parentHostedZoneId: zoneId,
+        parentHostedZoneId,
         removalPolicy: RemovalPolicy.DESTROY,
       });
     }

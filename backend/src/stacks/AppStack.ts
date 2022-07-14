@@ -3,7 +3,13 @@ import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { AppZone, Auth, WebDeployment, WebDistribution } from '~/constructs';
-import { AppEnv, authSubdomain, oauthScopes } from '~/consts';
+import {
+  AppEnv,
+  authSubdomain,
+  devAccountServiceRoleArn,
+  googleClientSecretParamName,
+  oauthScopes,
+} from '~/consts';
 import { StackOutput } from '~/types';
 
 interface AppStackProps extends StackProps {
@@ -18,17 +24,20 @@ export class AppStack extends Stack {
       envDomain,
       healthCheckAlarmEmails,
       hostedZoneId,
-      crossAccountParentHostedZone,
+      parentHostedZoneId,
+      googleClientId,
+      oauthSecretsAssumeRoleArn,
     } = appEnv;
 
     const { hostedZone, certificate } = new AppZone(this, 'AppZone', {
       envDomain,
       hostedZoneId,
-      crossAccountParentHostedZone,
+      parentHostedZoneId,
+      delegationRoleArn: devAccountServiceRoleArn,
       healthCheckAlarmEmails,
     });
 
-    const cdn = new WebDistribution(this, 'WebDistribution', {
+    const webCDN = new WebDistribution(this, 'WebDistribution', {
       hostedZone,
       envDomain,
       certificate,
@@ -40,9 +49,12 @@ export class AppStack extends Stack {
       hostedZone,
       certificate,
       oauthScopes,
+      googleClientId,
+      googleClientSecretParamName,
+      oauthSecretsAssumeRoleArn,
     });
 
-    auth.node.addDependency(cdn);
+    auth.node.addDependency(webCDN);
 
     const stackOutput: StackOutput = {
       userPoolClientId: auth.userPoolClientId,
@@ -51,8 +63,8 @@ export class AppStack extends Stack {
 
     new WebDeployment(this, 'ReactApp', {
       distPath: resolve('frontend/dist'),
-      distribution: cdn.distribution,
-      bucket: cdn.bucket,
+      distribution: webCDN.distribution,
+      bucket: webCDN.bucket,
       stackOutput,
     });
 
