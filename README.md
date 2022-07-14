@@ -10,7 +10,7 @@ Ask the administrator to create a personal AWS account for you, or provide him w
 
 `npx cdk bootstrap --profile your-aws-profile`
 
-### Choose a subdomain for your personal dev environments
+### Choose a subdomain for your personal dev environment
 
 The full domain will look like *__chosen-name__.dev.domain.com*
 
