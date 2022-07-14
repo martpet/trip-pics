@@ -2,9 +2,9 @@
 
 (work in progress)
 
-## Development setup
+## Setup development environment
 
-Ask the administrator to create for you a personal AWS account, or provide the ID of an existing AWS account.
+Ask the administrator to create a personal AWS account for you, or provide him with the ID of an existing AWS account.
 
 ### Bootstrap your AWS account for CDK
 

@@ -1,20 +1,18 @@
-# TripPics
+# Setup *Production*, *Staging* and *DevService* accounts
 
-## Setup *Production*, *Staging* and *DevService* accounts
-
-### Setup AWS Organizations
+## Setup AWS Organizations
 * Create `Production`, `Staging` and `DevService` accounts.
 * Create `Dev` unit.
 
-### Bootstrap
+## Bootstrap
 
 For *Production* and *Staging* environments run:
 
 `cd backend && npx cdk bootstrap --profile aws-profile-name`
 
-### Setup hosted zones
+## Setup hosted zones
 
-#### Create the hosted zones
+### Create the hosted zones
 
 In the *Production* account:
 * Create the *root* public hosted zone with name `yourdomain.com`.
@@ -30,7 +28,7 @@ In the *DevService* account:
 * Copy the *dev* hosted zone id to a variable named `devHostedZoneId` in *backend/consts/appConsts.ts*.
 * Copy the *NS* record from the *dev* zone into the *Production* account *root* zone.
 
-#### Create a policy for changing records
+### Create a policy for changing records
 
 In the *DevService* account create a policy named `HostedZoneChangeRecords`.
 
@@ -54,7 +52,7 @@ In the *DevService* account create a policy named `HostedZoneChangeRecords`.
     }
 </details>
 
-#### Register a domain
+### Register a domain
 
 In the *HostedZones* account:
 
@@ -62,9 +60,9 @@ In the *HostedZones* account:
 * Use the name servers from the *root* zone NS record.
 * Copy the domain name to a variable named `rootDomain` in *backend/consts/appConsts.ts*
 
-### Integrate Google Sign-In
+## Integrate Google Sign-In
 
-#### Create a OAuth client
+### Create a OAuth client
 
 For each environment (Dev, Staging and Production) create an OAuth client:
 
@@ -77,7 +75,7 @@ For each environment (Dev, Staging and Production) create an OAuth client:
 7. In the coresponding AWS account (*DevService*, *Staging*, *Production) add a secure string parameter to *Parameter store* and put the *Client secret* in it.
 8. Copy the name of the secure parameter to a variable named `googleClientSecretParamName` in *backend/consts/appConsts.ts*.
 
-#### Create a policy for reading the *Client Secret* parameter
+### Create a policy for reading the *Client Secret* parameter
 
 In the *DevService* account add a policy named `SSMGetOauthClientSecret`.
 
@@ -96,7 +94,7 @@ In the *DevService* account add a policy named `SSMGetOauthClientSecret`.
     }
 </details>
 
-### Add a role to be assumed by the personal dev accounts
+## Add a role to be assumed by the personal dev accounts
 
 In the *DevService* account create a role named `DevAccountServiceRole`.
 
@@ -130,7 +128,9 @@ Attatch the *HostedZoneChangeRecords* and *SSMGetOauthClientSecret* policies.
 
 Copy the ARN of *DevAccountServiceRole* role to a variable named `devAccountServiceRoleArn` in *backend/consts/appConsts.ts*.
 
-## Creating developer accounts
+---
+
+# Creating developer accounts
 
 Developers need permissions to assume the *DevAccountServiceRole* from the *DevService* account.
 
@@ -155,4 +155,4 @@ Don't forget to add the user's personal domain to Google Oauth Dev client *Autho
 
 ----
 
-Check also: [Setup personal dev account](README-setup-envs.md)
+Check also: [Setup personal dev account](README.md)
