@@ -9,9 +9,17 @@ export const getPersonalDevSubdomain = () => {
   if (!subdomain) {
     const fileName = '.env.local';
     const filePath = resolve(fileName);
-    subdomain = `${userInfo().username}${Date.now()}`;
+    let username;
+
+    try {
+      username = userInfo().username;
+    } catch (e) {
+      username = 'user';
+    }
+
+    subdomain = `${username}${Date.now()}`;
     appendFileSync(filePath, `\r${envKey}=${subdomain}`);
-    console.log(`❗️ Your personal environment's subdomain was written to ${filePath}.`);
+    console.log(`❗️ Your dev environment's subdomain was written to ${filePath}.`);
   }
 
   return subdomain.replace(/_|-$|\.|\*|\\|\//gi, '');

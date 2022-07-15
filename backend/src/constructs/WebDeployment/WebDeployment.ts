@@ -22,12 +22,15 @@ export class WebDeployment extends Construct {
     super(scope, id);
 
     const { stackName } = Stack.of(this);
-    const stackOutputFileContent = `window.${stackName} = ${JSON.stringify(stackOutput)}`;
+
+    const stackOutputJson = `{ 
+      "${stackName}": ${JSON.stringify(stackOutput)}
+    }`;
 
     new BucketDeployment(this, 'WebDeployment', {
       sources: [
         Source.asset(distPath),
-        Source.data('stack-output.js', stackOutputFileContent),
+        Source.jsonData('public/stack-output.json', stackOutputJson),
       ],
       destinationBucket: bucket,
       distribution,
