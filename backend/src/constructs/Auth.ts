@@ -73,7 +73,7 @@ export class Auth extends Construct {
       });
       googleSecret = Fn.select(0, values);
     } else {
-      googleSecret = SecretValue.ssmSecure(googleClientSecretParamName).toString();
+      googleSecret = SecretValue.ssmSecure(googleClientSecretParamName).unsafeUnwrap();
     }
 
     const googleIdentityProvider = new UserPoolIdentityProviderGoogle(
