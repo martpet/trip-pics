@@ -72,7 +72,7 @@ For each environment (Dev, Staging and Production) create an OAuth client:
 4. Add the application domain name to *Authorized JavaScript origins* (for *Dev* use `http://localhost:3000`).
 5. Add `<application-domain>/oauth2/idpresponse` to *Authorized redirect URIs*.
 6. Copy *Client ID* to variables named `googleClientIdDev`, `googleClientIdStaging` and `googleClientIdProd` in *backend/consts/appConsts.ts*.
-7. In the coresponding AWS account (*DevService*, *Staging*, *Production) add a secure string parameter to *Parameter store* and put the *Client secret* in it.
+7. In the coresponding AWS account (*DevService*, *Staging*, *Production) add a string parameter to *Parameter store* and put the *Client secret* in it (for *DevService* use a **secure** string).
 8. Copy the name of the secure parameter to a variable named `googleClientSecretParamName` in *backend/consts/appConsts.ts*.
 
 ### Create a policy for reading the *Client Secret* parameter

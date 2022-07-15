@@ -1,4 +1,4 @@
-import { Fn, RemovalPolicy, SecretValue } from 'aws-cdk-lib';
+import { Fn, RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   ProviderAttribute,
@@ -9,6 +9,7 @@ import {
 } from 'aws-cdk-lib/aws-cognito';
 import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
 import { CrossAccountSSM } from '~/constructs';
@@ -73,7 +74,9 @@ export class Auth extends Construct {
       });
       googleSecret = Fn.select(0, values);
     } else {
-      googleSecret = SecretValue.ssmSecure(googleClientSecretParamName).unsafeUnwrap();
+      googleSecret = StringParameter.fromStringParameterAttributes(this, 'GoogleSecret', {
+        parameterName: googleClientSecretParamName,
+      }).stringValue;
     }
 
     const googleIdentityProvider = new UserPoolIdentityProviderGoogle(
