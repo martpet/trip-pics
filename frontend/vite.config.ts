@@ -14,5 +14,8 @@ export default defineConfig({
     cssCodeSplit: false,
     target: 'esnext',
   },
+  server: {
+    port: 3000,
+  },
   envDir: '../',
 });
