@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
           cache: 'npm'
 
       - name: Install dependencies
@@ -39,7 +39,7 @@ jobs:
           role-duration-seconds: 3600
 
       - name: CDK deploy
-        uses: martpet/aws-cdk-github-actions@v2.1.3
+        uses: martpet/aws-cdk-github-actions@v2.1.4
         with:
           cdk_subcommand: 'deploy'
           cdk_version: '2.32.0'
