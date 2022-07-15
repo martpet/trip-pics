@@ -14,8 +14,10 @@ export class CrossAccountSSM extends Construct {
   constructor(scope: Construct, id: string, handlerProps: CrossAccountSSMProps) {
     super(scope, id);
 
+    // handlerProps.getParametersInput.WithDecryption ??= true;
+
     // eslint-disable-next-line no-param-reassign
-    handlerProps.getParametersInput.WithDecryption ??= true;
+    handlerProps.getParametersInput.WithDecryption = true;
 
     const onEventHandler = new NodejsFunction(this, 'handler');
 
