@@ -5,4 +5,4 @@ cdk.out
 .cdk.staging
 .env.local
 .env.*.local
-frontend/public/stack-output.json
+frontend/public/cdk-output.json

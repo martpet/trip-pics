@@ -9,8 +9,9 @@ import {
   devAccountServiceRoleArn,
   googleClientSecretParamName,
   oauthScopes,
+  stackName,
 } from '~/consts';
-import { StackOutput } from '~/types';
+import { CdkOutput, StackOutput } from '~/types';
 
 interface AppStackProps extends StackProps {
   appEnv: AppEnv;
@@ -61,15 +62,19 @@ export class AppStack extends Stack {
       authDomain: auth.authDomain,
     };
 
+    const cdkOutput: CdkOutput = {
+      [stackName]: stackOutput,
+    };
+
     new WebDeployment(this, 'ReactApp', {
       distPath: resolve('frontend/dist'),
       distribution: webCDN.distribution,
       bucket: webCDN.bucket,
-      stackOutput,
+      cdkOutput,
     });
 
-    Object.entries(stackOutput).forEach(([key, value]) => {
-      new CfnOutput(this, key, { value });
-    });
+    Object.entries(stackOutput).forEach(
+      ([key, value]) => new CfnOutput(this, key, { value })
+    );
   }
 }

@@ -1,7 +1,7 @@
 import { stackName } from '~/consts';
-import { StackOutput } from '~/types';
+import { CdkOutput } from '~/types';
 
-const response = await fetch('/stack-output.json');
-const outputEntries = await response.json();
+const response = await fetch('/cdk-output.json');
+const cdkOutput: CdkOutput = await response.json();
 
-export const getStackOutput = () => outputEntries[stackName] as StackOutput;
+export const getStackOutput = () => cdkOutput[stackName];
