@@ -69,11 +69,11 @@ For each environment (Dev, Staging and Production) create an OAuth client:
 1. Go to [Credentials](https://console.cloud.google.com/apis/credentials) in *Google Cloud*.
 2. Click *Create credentials* > *OAuth client ID*.
 3. Select the *Web application* type.
-4. Add the application domain name to *Authorized JavaScript origins* (for *Dev* use `http://localhost:3000`).
-5. Add `<application-domain>/oauth2/idpresponse` to *Authorized redirect URIs*.
+4. Add `https://auth.<app-domain>` to *Authorized JavaScript origins* .
+5. Add `https://auth.<app-domain>/oauth2/idpresponse` to *Authorized redirect URIs*.
 6. Copy *Client ID* to variables named `googleClientIdDev`, `googleClientIdStaging` and `googleClientIdProd` in *backend/consts/appConsts.ts*.
 7. In the coresponding AWS account (*DevService*, *Staging*, *Production) add a string parameter to *Parameter store* and put the *Client secret* in it (for *DevService* use a **secure** string).
-8. Copy the name of the secure parameter to a variable named `googleClientSecretParamName` in *backend/consts/appConsts.ts*.
+8. Copy the name of the string parameter to a single variable named `googleClientSecretParamName` in *backend/consts/appConsts.ts*.
 
 ### Create a policy for reading the *Client Secret* parameter
 
@@ -150,8 +150,6 @@ There are two options:
         "Action": "sts:AssumeRole"
     }
 </details>
-
-Don't forget to add the user's personal domain to Google Oauth Dev client *Authorized JavaScript origins* and *Authorized redirect URIs*.
 
 ----
 
