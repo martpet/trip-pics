@@ -38,11 +38,5 @@ jobs:
           role-skip-session-tagging: true
           role-duration-seconds: 3600
 
-      - name: CDK deploy
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'deploy'
-          cdk_version: '2.32.0'
-          working_dir: 'backend'
-          cdk_args: '--require-approval never --context envName=${{ inputs.ENV_NAME }}'
-          actions_comment: false
+      - name: Deploy stack
+        run: cd backend && npx cdk deploy --context envName=${{ inputs.ENV_NAME }} --require-approval never
