@@ -1,6 +1,12 @@
 import { Environment } from 'aws-cdk-lib';
 
 import {
+  appleClientIdDev,
+  appleClientIdProd,
+  appleClientIdStaging,
+  appleKeyIdDev,
+  appleKeyIdProd,
+  appleKeyIdStaging,
   devAccountServiceRoleArn,
   devHostedZoneId,
   googleClientIdDev,
@@ -22,7 +28,9 @@ export interface CommonProps {
   envDomain: string;
   healthCheckAlarmEmails?: string[];
   googleClientId: string;
-  oauthSecretsAssumeRoleArn?: string;
+  appleClientId: string;
+  appleKeyId: string;
+  authSecretsAssumeRoleArn?: string;
 }
 
 interface WithParentHostedZone {
@@ -45,6 +53,8 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
     healthCheckAlarmEmails: healthCheckAlarmEmailsProd,
     hostedZoneId: rootHostedZoneId,
     googleClientId: googleClientIdProd,
+    appleClientId: appleClientIdProd,
+    appleKeyId: appleKeyIdProd,
     env: {
       account: prodAccountId,
       region,
@@ -55,6 +65,8 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
     healthCheckAlarmEmails: healthCheckAlarmEmailsStaging,
     hostedZoneId: stagingHostedZoneId,
     googleClientId: googleClientIdStaging,
+    appleClientId: appleClientIdStaging,
+    appleKeyId: appleKeyIdStaging,
     env: {
       account: stagingAccountId,
       region,
@@ -64,6 +76,8 @@ export const appEnvs: Record<EnvName, AppEnvWithAWSEnv> = {
     envDomain: `${getPersonalDevSubdomain()}.dev.${rootDomain}`,
     parentHostedZoneId: devHostedZoneId,
     googleClientId: googleClientIdDev,
-    oauthSecretsAssumeRoleArn: devAccountServiceRoleArn,
+    appleClientId: appleClientIdDev,
+    appleKeyId: appleKeyIdDev,
+    authSecretsAssumeRoleArn: devAccountServiceRoleArn,
   },
 };

@@ -5,10 +5,11 @@ import { Construct } from 'constructs';
 import { AppZone, Auth, WebDeployment, WebDistribution } from '~/constructs';
 import {
   AppEnv,
+  applePrivateKeyParamName,
+  appleTeamId,
   authSubdomain,
   devAccountServiceRoleArn,
   googleClientSecretParamName,
-  oauthScopes,
   stackName,
 } from '~/consts';
 import { CdkOutput, StackOutput } from '~/types';
@@ -27,7 +28,9 @@ export class AppStack extends Stack {
       hostedZoneId,
       parentHostedZoneId,
       googleClientId,
-      oauthSecretsAssumeRoleArn,
+      authSecretsAssumeRoleArn,
+      appleClientId,
+      appleKeyId,
     } = appEnv;
 
     const { hostedZone, certificate } = new AppZone(this, 'AppZone', {
@@ -49,10 +52,13 @@ export class AppStack extends Stack {
       authSubdomain,
       hostedZone,
       certificate,
-      oauthScopes,
       googleClientId,
       googleClientSecretParamName,
-      oauthSecretsAssumeRoleArn,
+      appleTeamId,
+      appleClientId,
+      appleKeyId,
+      applePrivateKeyParamName,
+      authSecretsAssumeRoleArn,
     });
 
     auth.node.addDependency(webCDN);

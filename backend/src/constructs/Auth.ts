@@ -1,10 +1,11 @@
-import { Fn, RemovalPolicy } from 'aws-cdk-lib';
+import { RemovalPolicy } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   ProviderAttribute,
   UserPool,
   UserPoolClient,
   UserPoolClientIdentityProvider,
+  UserPoolIdentityProviderApple,
   UserPoolIdentityProviderGoogle,
 } from 'aws-cdk-lib/aws-cognito';
 import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
@@ -19,10 +20,13 @@ interface AuthProps {
   authSubdomain: string;
   certificate: ICertificate;
   hostedZone: IHostedZone;
-  oauthScopes: string[];
   googleClientId: string;
   googleClientSecretParamName: string;
-  oauthSecretsAssumeRoleArn?: string;
+  appleTeamId: string;
+  appleClientId: string;
+  appleKeyId: string;
+  applePrivateKeyParamName: string;
+  authSecretsAssumeRoleArn?: string;
 }
 
 export class Auth extends Construct {
@@ -38,15 +42,21 @@ export class Auth extends Construct {
       authSubdomain,
       certificate,
       hostedZone,
-      oauthScopes,
       googleClientId,
       googleClientSecretParamName,
-      oauthSecretsAssumeRoleArn,
+      appleTeamId,
+      appleClientId,
+      appleKeyId,
+      applePrivateKeyParamName,
+      authSecretsAssumeRoleArn,
     }: AuthProps
   ) {
     super(scope, id);
 
     this.authDomain = `${authSubdomain}.${envDomain}`;
+
+    let googleSecret: string;
+    let applePrivateKey: string;
 
     const userPool = new UserPool(this, 'UserPool', {
       removalPolicy: RemovalPolicy.DESTROY,
@@ -65,47 +75,76 @@ export class Auth extends Construct {
       target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
     });
 
-    let googleSecret: string;
-
-    if (oauthSecretsAssumeRoleArn) {
+    if (authSecretsAssumeRoleArn) {
       const { values } = new CrossAccountSSM(this, 'OAuthSecrets', {
-        roleArn: oauthSecretsAssumeRoleArn,
-        getParametersInput: { Names: [googleClientSecretParamName] },
+        roleArn: authSecretsAssumeRoleArn,
+        getParametersInput: {
+          Names: [googleClientSecretParamName, applePrivateKeyParamName],
+        },
       });
-      googleSecret = Fn.select(0, values);
+      [googleSecret, applePrivateKey] = values;
     } else {
       googleSecret = StringParameter.fromStringParameterAttributes(this, 'GoogleSecret', {
         parameterName: googleClientSecretParamName,
       }).stringValue;
+      applePrivateKey = StringParameter.fromStringParameterAttributes(
+        this,
+        'ApplePrivateKey',
+        {
+          parameterName: applePrivateKeyParamName,
+        }
+      ).stringValue;
     }
 
-    const googleIdentityProvider = new UserPoolIdentityProviderGoogle(
+    const googleIdProvider = new UserPoolIdentityProviderGoogle(
       this,
       'GoogleIdentityProvider',
       {
         userPool,
         clientId: googleClientId,
         clientSecret: googleSecret,
-        scopes: oauthScopes,
+        scopes: ['email', 'profile'],
         attributeMapping: {
           email: ProviderAttribute.GOOGLE_EMAIL,
-          custom: {
-            picture: ProviderAttribute.GOOGLE_PICTURE,
-          },
+          givenName: ProviderAttribute.GOOGLE_GIVEN_NAME,
+          familyName: ProviderAttribute.GOOGLE_FAMILY_NAME,
+          profilePicture: ProviderAttribute.GOOGLE_PICTURE,
         },
       }
     );
 
-    const client = new UserPoolClient(this, 'UserPoolClient', {
+    const appleIdProvider = new UserPoolIdentityProviderApple(
+      this,
+      'AppleIdentityProvider',
+      {
+        userPool,
+        teamId: appleTeamId,
+        clientId: appleClientId,
+        keyId: appleKeyId,
+        privateKey: applePrivateKey,
+        scopes: ['email', 'name'],
+        attributeMapping: {
+          email: ProviderAttribute.APPLE_EMAIL,
+          givenName: ProviderAttribute.APPLE_FIRST_NAME,
+          familyName: ProviderAttribute.APPLE_LAST_NAME,
+        },
+      }
+    );
+
+    const userPoolClient = new UserPoolClient(this, 'UserPoolClient', {
       userPool,
-      supportedIdentityProviders: [UserPoolClientIdentityProvider.GOOGLE],
+      supportedIdentityProviders: [
+        UserPoolClientIdentityProvider.APPLE,
+        UserPoolClientIdentityProvider.GOOGLE,
+      ],
       oAuth: {
         callbackUrls: [`https://${envDomain}`, 'http://localhost:3000'],
       },
     });
 
-    client.node.addDependency(googleIdentityProvider);
+    userPoolClient.node.addDependency(appleIdProvider);
+    userPoolClient.node.addDependency(googleIdProvider);
 
-    this.userPoolClientId = client.userPoolClientId;
+    this.userPoolClientId = userPoolClient.userPoolClientId;
   }
 }

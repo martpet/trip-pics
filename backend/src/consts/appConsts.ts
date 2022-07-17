@@ -14,4 +14,11 @@ export const googleClientSecretParamName = '/oauth/google/client-secret';
 export const googleClientIdProd = '276806659709-nbtr116utpr7ak4j43gfq7sfi0frtcra.apps.googleusercontent.com';
 export const googleClientIdStaging = '276806659709-du1tv5u4juububcu61o1hn5mafc76b54.apps.googleusercontent.com';
 export const googleClientIdDev = '276806659709-6lap8v4ekmsqqrdaosb3tmiq6j24fvgv.apps.googleusercontent.com';
-
+export const appleTeamId = 'HJ6Q44MPBD';
+export const appleClientIdDev = 'TripPicsWebsiteDev';
+export const appleClientIdStaging = 'TripPicsWebsiteStaging';
+export const appleClientIdProd = 'TripPicsWebsiteProd';
+export const appleKeyIdDev = 'CWS2D262UY';
+export const appleKeyIdStaging = 'CUBN8UAVWR';
+export const appleKeyIdProd = '6U6N9CLL8X';
+export const applePrivateKeyParamName = '/oauth/apple/key-secret';
