@@ -10,7 +10,7 @@ Ask the administrator to create a personal AWS account for you, or provide him w
 
 ### Bootstrap your AWS account for CDK
 
-`npx cdk bootstrap --profile your-aws-profile`
+`npx cdk bootstrap aws://<account-number>/<region> --profile <profile>`
 
 ### Choose a subdomain for your personal dev environment
 
