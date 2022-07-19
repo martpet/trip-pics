@@ -70,6 +70,8 @@ async function updateUsersTable(event: PostAuthenticationTriggerEvent) {
     return undefined;
   }
 
+  console.log('expressionActions', expressionActions);
+
   const updateItemCommand = new UpdateItemCommand({
     TableName: usersTableName,
     Key: usersTableKey,
@@ -80,7 +82,7 @@ async function updateUsersTable(event: PostAuthenticationTriggerEvent) {
 
   const response = await client.send(updateItemCommand);
 
-  console.log(response);
+  console.log('Response', response);
 
   return event;
 }
