@@ -1,4 +1,4 @@
-import { CustomResource, Fn, Token } from 'aws-cdk-lib';
+import { CustomResource, Token } from 'aws-cdk-lib';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Provider } from 'aws-cdk-lib/custom-resources';
@@ -33,8 +33,6 @@ export class CrossAccountSSM extends Construct {
       properties: handlerProps,
     });
 
-    const tokenList = Token.asList(customResource.getAtt('values'));
-
-    this.values = tokenList.map((_, index) => Fn.select(index, tokenList));
+    this.values = Token.asList(customResource.getAtt('values'));
   }
 }

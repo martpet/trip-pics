@@ -1,3 +1,4 @@
+import { Fn } from 'aws-cdk-lib';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
@@ -24,7 +25,8 @@ export const getIdPSecrets = (
       },
     });
 
-    [googleSecret, appleSecret] = values;
+    googleSecret = Fn.select(0, values);
+    appleSecret = Fn.select(1, values);
   } else {
     googleSecret = StringParameter.fromStringParameterAttributes(scope, 'GoogleSecret', {
       parameterName: googleParam,
