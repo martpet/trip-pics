@@ -1,1 +1,1 @@
-export * from './WebDeployment';
+export * from './StaticSite';

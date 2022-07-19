@@ -90,6 +90,7 @@ export class Cognito extends Construct {
 
     const userPool = new UserPool(this, 'UserPool', {
       removalPolicy: RemovalPolicy.DESTROY,
+      // todo: why the lambda triggers are not created?
       lambdaTriggers: {
         postConfirmationLambda,
         postAuthenticationLambda,

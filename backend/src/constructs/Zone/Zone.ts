@@ -13,7 +13,7 @@ import { Construct } from 'constructs';
 
 import { HealthCheck } from './HealthCheck';
 
-interface AppZoneProps {
+interface ZoneProps {
   envDomain: string;
   hostedZoneId?: string;
   parentHostedZoneId?: string;
@@ -21,7 +21,7 @@ interface AppZoneProps {
   healthCheckAlarmEmails?: string[];
 }
 
-export class AppZone extends Construct {
+export class Zone extends Construct {
   readonly hostedZone: IHostedZone;
 
   readonly certificate: ICertificate;
@@ -35,7 +35,7 @@ export class AppZone extends Construct {
       parentHostedZoneId,
       delegationRoleArn,
       healthCheckAlarmEmails,
-    }: AppZoneProps
+    }: ZoneProps
   ) {
     super(scope, id);
 
@@ -71,9 +71,11 @@ export class AppZone extends Construct {
       hostedZone,
       domainName: envDomain,
       subjectAlternativeNames: [`*.${envDomain}`],
-      region: 'us-east-1', // us-east-1 needed by CloudFront
+      region: 'us-east-1',
       cleanupRoute53Records: true,
     });
+
+    certificate.node.addDependency(hostedZone); // try if cleanupRoute53Records will work
 
     this.certificate = certificate;
     this.hostedZone = hostedZone;

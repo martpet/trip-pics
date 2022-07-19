@@ -5,18 +5,18 @@ import { Construct } from 'constructs';
 
 import { CdkOutput } from './webDeploymentTypes';
 
-interface WebDeploymentProps {
+interface StaticSiteProps {
   distPath: string;
   distribution: IDistribution;
   bucket: IBucket;
   cdkOutput: CdkOutput;
 }
 
-export class WebDeployment extends Construct {
+export class StaticSite extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { distPath, distribution, bucket, cdkOutput }: WebDeploymentProps
+    { distPath, distribution, bucket, cdkOutput }: StaticSiteProps
   ) {
     super(scope, id);
 

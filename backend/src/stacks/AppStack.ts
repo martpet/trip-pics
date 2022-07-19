@@ -2,7 +2,7 @@ import { resolve } from 'app-root-path';
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { AppZone, Cognito, Database, WebDeployment, WebDistribution } from '~/constructs';
+import { Cognito, Db, StaticSite, WebDistribution, Zone } from '~/constructs';
 import {
   AppEnv,
   applePrivateKeyParamName,
@@ -34,7 +34,7 @@ export class AppStack extends Stack {
       appleKeyId,
     } = appEnv;
 
-    const { hostedZone, certificate } = new AppZone(this, 'AppZone', {
+    const { hostedZone, certificate } = new Zone(this, 'Zone', {
       envDomain,
       hostedZoneId,
       parentHostedZoneId,
@@ -42,13 +42,13 @@ export class AppStack extends Stack {
       healthCheckAlarmEmails,
     });
 
-    const webCDN = new WebDistribution(this, 'WebDistribution', {
+    const webDistribution = new WebDistribution(this, 'WebDistribution', {
       hostedZone,
       envDomain,
       certificate,
     });
 
-    const { usersTable } = new Database(this, 'Database');
+    const { usersTable } = new Db(this, 'Db');
 
     const cognito = new Cognito(this, 'Cognito', {
       envDomain,
@@ -66,7 +66,7 @@ export class AppStack extends Stack {
       authSecretsAssumeRoleArn,
     });
 
-    cognito.node.addDependency(webCDN);
+    cognito.node.addDependency(webDistribution);
 
     const stackOutput: StackOutput = {
       userPoolClientId: cognito.userPoolClientId,
@@ -77,10 +77,10 @@ export class AppStack extends Stack {
       [stackName]: stackOutput,
     };
 
-    new WebDeployment(this, 'ReactApp', {
+    new StaticSite(this, 'StaticSite', {
       distPath: resolve('frontend/dist'),
-      distribution: webCDN.distribution,
-      bucket: webCDN.bucket,
+      distribution: webDistribution.distribution,
+      bucket: webDistribution.bucket,
       cdkOutput,
     });
 

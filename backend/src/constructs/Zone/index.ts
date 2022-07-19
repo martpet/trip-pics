@@ -1,2 +1,2 @@
-export * from './AppZone';
+export * from './Zone';
 export * from './HealthCheck';

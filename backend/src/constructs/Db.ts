@@ -1,9 +1,10 @@
+import { RemovalPolicy } from 'aws-cdk-lib';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct, IConstruct } from 'constructs';
 
 import { AppTable } from '~/constructs';
 
-export class Database extends Construct {
+export class Db extends Construct {
   public usersTable: Table;
 
   constructor(scope: IConstruct, id: string) {
@@ -14,6 +15,7 @@ export class Database extends Construct {
         name: 'username',
         type: AttributeType.STRING,
       },
+      removalPolicy: RemovalPolicy.DESTROY,
     });
   }
 }
