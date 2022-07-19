@@ -27,7 +27,9 @@ export const handler = async (event: PostConfirmationTriggerEvent) => {
     Item: usersTableItem,
   });
 
-  await client.send(putItemCommand);
+  const response = await client.send(putItemCommand);
+
+  console.log(response);
 
   return event;
 };
