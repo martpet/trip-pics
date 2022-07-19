@@ -2,7 +2,7 @@ import { resolve } from 'app-root-path';
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { AppZone, Auth, WebDeployment, WebDistribution } from '~/constructs';
+import { AppZone, Auth, Database, WebDeployment, WebDistribution } from '~/constructs';
 import {
   AppEnv,
   applePrivateKeyParamName,
@@ -10,6 +10,7 @@ import {
   authSubdomain,
   devAccountServiceRoleArn,
   googleClientSecretParamName,
+  localhostPort,
   stackName,
 } from '~/consts';
 import { CdkOutput, StackOutput } from '~/types';
@@ -47,11 +48,15 @@ export class AppStack extends Stack {
       certificate,
     });
 
+    const { usersTable } = new Database(this, 'Database');
+
     const auth = new Auth(this, 'Auth', {
       envDomain,
       authSubdomain,
+      localhostPort,
       hostedZone,
       certificate,
+      usersTable,
       googleClientId,
       googleClientSecretParamName,
       appleTeamId,

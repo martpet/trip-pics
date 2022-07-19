@@ -16,12 +16,13 @@
     "test:backend": "jest --config=backend/jest.config.ts",
     "build": "vite build frontend",
     "synth": "cd backend && npx cdk synth --context envName=Personal",
-    "deploy": "npm run build && cd backend && npx cdk deploy --context envName=Personal --outputs-file ../frontend/public/cdk-output.json",
+    "deploy": "npm t & npm run build && cd backend && npx cdk deploy --context envName=Personal --outputs-file ../frontend/public/cdk-output.json",
     "destroy": "cd backend && npx cdk destroy",
     "prepare": "husky install"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.118.0",
+    "@aws-sdk/client-dynamodb": "^3.131.0",
     "@aws-sdk/client-sns": "^3.118.1",
     "@aws-sdk/client-ssm": "^3.128.0",
     "@aws-sdk/client-sts": "^3.128.0",
@@ -30,7 +31,8 @@
     "constructs": "^10.1.46",
     "dotenv-flow": "^3.2.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "utility-types": "^3.10.0"
   },
   "devDependencies": {
     "@types/app-root-path": "^1.2.4",

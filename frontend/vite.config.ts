@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 import pluginRewriteAll from 'vite-plugin-rewrite-all';
 import svgrPlugin from 'vite-plugin-svgr';
 
+import { localhostPort } from '../common/consts';
+
 export default defineConfig({
   plugins: [react(), svgrPlugin(), pluginRewriteAll()],
   resolve: {
@@ -15,7 +17,7 @@ export default defineConfig({
     target: 'esnext',
   },
   server: {
-    port: 3000,
+    port: localhostPort,
   },
   envDir: '../',
 });

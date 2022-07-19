@@ -3,7 +3,7 @@ import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
-import { CdkOutput } from './types';
+import { CdkOutput } from './webDeploymentTypes';
 
 interface WebDeploymentProps {
   distPath: string;

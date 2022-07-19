@@ -8,18 +8,21 @@ import {
   UserPoolIdentityProviderApple,
   UserPoolIdentityProviderGoogle,
 } from 'aws-cdk-lib/aws-cognito';
+import { Table } from 'aws-cdk-lib/aws-dynamodb';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
-import { CrossAccountSSM } from '~/constructs';
+import { getIdPSecrets } from './getIdPSecrets';
 
 interface AuthProps {
   envDomain: string;
   authSubdomain: string;
+  localhostPort: number;
   certificate: ICertificate;
   hostedZone: IHostedZone;
+  usersTable: Table;
   googleClientId: string;
   googleClientSecretParamName: string;
   appleTeamId: string;
@@ -42,6 +45,8 @@ export class Auth extends Construct {
       authSubdomain,
       certificate,
       hostedZone,
+      localhostPort,
+      usersTable,
       googleClientId,
       googleClientSecretParamName,
       appleTeamId,
@@ -53,18 +58,47 @@ export class Auth extends Construct {
   ) {
     super(scope, id);
 
-    this.authDomain = `${authSubdomain}.${envDomain}`;
+    const authDomain = `${authSubdomain}.${envDomain}`;
 
-    let googleSecret: string;
-    let applePrivateKey: string;
+    const { googleSecret, appleSecret } = getIdPSecrets(this, {
+      googleParam: googleClientSecretParamName,
+      appleParam: applePrivateKeyParamName,
+      roleArn: authSecretsAssumeRoleArn,
+    });
+
+    const userPoolLambdasProps = {
+      environment: {
+        usersTableName: usersTable.tableName,
+        usersTableSchemaJson: JSON.stringify(usersTable.schema()),
+      },
+    };
+
+    const postConfirmationLambda = new NodejsFunction(
+      this,
+      'PostConfirmLambda',
+      userPoolLambdasProps
+    );
+
+    const postAuthenticationLambda = new NodejsFunction(
+      this,
+      'PostAuthLambda',
+      userPoolLambdasProps
+    );
+
+    usersTable.grantReadWriteData(postConfirmationLambda);
+    usersTable.grantReadWriteData(postAuthenticationLambda);
 
     const userPool = new UserPool(this, 'UserPool', {
       removalPolicy: RemovalPolicy.DESTROY,
+      lambdaTriggers: {
+        postConfirmationLambda,
+        postAuthenticationLambda,
+      },
     });
 
     const userPoolDomain = userPool.addDomain('UserPoolDomain', {
       customDomain: {
-        domainName: this.authDomain,
+        domainName: authDomain,
         certificate,
       },
     });
@@ -74,27 +108,6 @@ export class Auth extends Construct {
       recordName: authSubdomain,
       target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
     });
-
-    if (authSecretsAssumeRoleArn) {
-      const { values } = new CrossAccountSSM(this, 'OAuthSecrets', {
-        roleArn: authSecretsAssumeRoleArn,
-        getParametersInput: {
-          Names: [googleClientSecretParamName, applePrivateKeyParamName],
-        },
-      });
-      [googleSecret, applePrivateKey] = values;
-    } else {
-      googleSecret = StringParameter.fromStringParameterAttributes(this, 'GoogleSecret', {
-        parameterName: googleClientSecretParamName,
-      }).stringValue;
-      applePrivateKey = StringParameter.fromStringParameterAttributes(
-        this,
-        'ApplePrivateKey',
-        {
-          parameterName: applePrivateKeyParamName,
-        }
-      ).stringValue;
-    }
 
     const googleIdProvider = new UserPoolIdentityProviderGoogle(
       this,
@@ -121,7 +134,7 @@ export class Auth extends Construct {
         teamId: appleTeamId,
         clientId: appleClientId,
         keyId: appleKeyId,
-        privateKey: applePrivateKey,
+        privateKey: appleSecret,
         scopes: ['email', 'name'],
         attributeMapping: {
           email: ProviderAttribute.APPLE_EMAIL,
@@ -138,7 +151,7 @@ export class Auth extends Construct {
         UserPoolClientIdentityProvider.GOOGLE,
       ],
       oAuth: {
-        callbackUrls: [`https://${envDomain}`, 'http://localhost:3000'],
+        callbackUrls: [`https://${envDomain}`, `http://localhost:${localhostPort}`],
       },
     });
 
@@ -146,5 +159,6 @@ export class Auth extends Construct {
     userPoolClient.node.addDependency(googleIdProvider);
 
     this.userPoolClientId = userPoolClient.userPoolClientId;
+    this.authDomain = authDomain;
   }
 }
