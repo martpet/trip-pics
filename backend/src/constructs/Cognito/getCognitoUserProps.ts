@@ -12,9 +12,9 @@ export const getCognitoUserProps = (event: Event) => {
     username: event.userName,
     sub: userAttributes.sub,
     provider: identity.providerName as CognitoUserProps['provider'],
-    givenName: userAttributes.given_name,
-    familyName: userAttributes.family_name,
-    picture: userAttributes.picture,
+    givenName: userAttributes.given_name || '',
+    familyName: userAttributes.family_name || '',
+    picture: userAttributes.picture || '',
     email: userAttributes.email,
     dateCreated: identity.dateCreated,
   };

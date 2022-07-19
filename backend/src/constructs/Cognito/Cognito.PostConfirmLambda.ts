@@ -7,8 +7,12 @@ import { CognitoUserProps, TableItem } from '~/types';
 import { getCognitoUserProps } from './getCognitoUserProps';
 
 export const handler = async (event: PostConfirmationTriggerEvent) => {
-  const client = new DynamoDBClient({});
+  await createUserInDb(event);
+  return event;
+};
 
+async function createUserInDb(event: PostConfirmationTriggerEvent) {
+  const client = new DynamoDBClient({});
   const props = getCognitoUserProps(event);
 
   const usersTableItem: TableItem<CognitoUserProps> = {
@@ -22,8 +26,6 @@ export const handler = async (event: PostConfirmationTriggerEvent) => {
     dateCreated: { N: String(props.dateCreated) },
   };
 
-  console.log('Item', usersTableItem);
-
   const putItemCommand = new PutItemCommand({
     TableName: process.env.usersTableName,
     Item: usersTableItem,
@@ -31,7 +33,6 @@ export const handler = async (event: PostConfirmationTriggerEvent) => {
 
   const response = await client.send(putItemCommand);
 
+  console.log('Table Item', usersTableItem);
   console.log('Response', response);
-
-  return event;
-};
+}
