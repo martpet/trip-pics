@@ -7,15 +7,14 @@ import {
 import { SchemaOptions } from 'aws-cdk-lib/aws-dynamodb';
 import { PostAuthenticationTriggerEvent } from 'aws-lambda';
 
-import { CognitoUserProps, MutableCognitoUsersProps } from './authTypes';
+import { CognitoUserProps, MutableCognitoUserProps } from './cognitoTypes';
 import { getCognitoUserProps } from './getCognitoUserProps';
 
-type HandlerEvent = PostAuthenticationTriggerEvent;
-
-export const handler = async (event: HandlerEvent) => {
+export const handler = async (event: PostAuthenticationTriggerEvent) => {
   const props = getCognitoUserProps(event);
+  const { provider } = props;
 
-  if (props.provider === 'Google') {
+  if (provider === 'Google') {
     await updateUsersTable(props);
   }
   return event;
@@ -24,7 +23,7 @@ export const handler = async (event: HandlerEvent) => {
 async function updateUsersTable(props: CognitoUserProps) {
   const { username, givenName, familyName, picture, email } = props;
 
-  const mutableProps: MutableCognitoUsersProps = {
+  const mutableProps: MutableCognitoUserProps = {
     givenName,
     familyName,
     picture,

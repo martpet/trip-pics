@@ -2,7 +2,7 @@ import { resolve } from 'app-root-path';
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { AppZone, Auth, Database, WebDeployment, WebDistribution } from '~/constructs';
+import { AppZone, Cognito, Database, WebDeployment, WebDistribution } from '~/constructs';
 import {
   AppEnv,
   applePrivateKeyParamName,
@@ -50,7 +50,7 @@ export class AppStack extends Stack {
 
     const { usersTable } = new Database(this, 'Database');
 
-    const auth = new Auth(this, 'Auth', {
+    const cognito = new Cognito(this, 'Cognito', {
       envDomain,
       authSubdomain,
       localhostPort,
@@ -66,11 +66,11 @@ export class AppStack extends Stack {
       authSecretsAssumeRoleArn,
     });
 
-    auth.node.addDependency(webCDN);
+    cognito.node.addDependency(webCDN);
 
     const stackOutput: StackOutput = {
-      userPoolClientId: auth.userPoolClientId,
-      authDomain: auth.authDomain,
+      userPoolClientId: cognito.userPoolClientId,
+      authDomain: cognito.authDomain,
     };
 
     const cdkOutput: CdkOutput = {

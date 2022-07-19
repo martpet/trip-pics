@@ -16,7 +16,7 @@ import { Construct } from 'constructs';
 
 import { getIdPSecrets } from './getIdPSecrets';
 
-interface AuthProps {
+interface CognitoProps {
   envDomain: string;
   authSubdomain: string;
   localhostPort: number;
@@ -32,7 +32,7 @@ interface AuthProps {
   authSecretsAssumeRoleArn?: string;
 }
 
-export class Auth extends Construct {
+export class Cognito extends Construct {
   readonly userPoolClientId: string;
 
   readonly authDomain: string;
@@ -54,7 +54,7 @@ export class Auth extends Construct {
       appleKeyId,
       applePrivateKeyParamName,
       authSecretsAssumeRoleArn,
-    }: AuthProps
+    }: CognitoProps
   ) {
     super(scope, id);
 

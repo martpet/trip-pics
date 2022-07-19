@@ -2,7 +2,7 @@ import { CognitoUserProps } from '~/types';
 
 export { CognitoUserProps, TableItem } from '~/types';
 
-export type MutableCognitoUsersProps = Pick<
+export type MutableCognitoUserProps = Pick<
   CognitoUserProps,
   'givenName' | 'familyName' | 'picture' | 'email'
 >;

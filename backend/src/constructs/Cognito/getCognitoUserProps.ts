@@ -1,6 +1,6 @@
 import { PostAuthenticationTriggerEvent, PostConfirmationTriggerEvent } from 'aws-lambda';
 
-import { CognitoIdentity, CognitoUserProps } from './authTypes';
+import { CognitoIdentity, CognitoUserProps } from './cognitoTypes';
 
 type Event = PostConfirmationTriggerEvent | PostAuthenticationTriggerEvent;
 
