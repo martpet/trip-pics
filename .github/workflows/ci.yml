@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Test, lint & check types
-        run: npm check-all
+        run: npm run test-all
 
       - name: Build frontend
         run: npm run build
