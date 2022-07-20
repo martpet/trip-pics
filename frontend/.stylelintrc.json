@@ -5,11 +5,9 @@
     "stylelint-config-css-modules"
   ],
   "plugins": [
-    "stylelint-order",
-    "stylelint-use-nesting"
+    "stylelint-order"
   ],
   "rules": {
-    "csstools/use-nesting": "always",
     "selector-class-pattern": "",
     "keyframes-name-pattern": ""
   }

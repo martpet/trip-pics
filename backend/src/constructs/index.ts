@@ -1,6 +1,5 @@
 export * from './AppPipeline';
 export * from './AppTable';
-export * from './Zone';
 export * from './CodeBuildStatusToGit';
 export * from './Cognito';
 export * from './CrossAccountSSM';
@@ -9,3 +8,4 @@ export * from './CrossRegionSNSTopic';
 export * from './Db';
 export * from './WebDeployment';
 export * from './WebDistribution';
+export * from './Zone';

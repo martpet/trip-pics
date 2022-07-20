@@ -1,2 +1,2 @@
-export * from './Zone';
 export * from './HealthCheck';
+export * from './Zone';

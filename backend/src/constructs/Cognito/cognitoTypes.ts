@@ -1,9 +1,9 @@
-import { CognitoUserProps } from '~/types';
+import { UserPropsFromCognito } from '~/types';
 
-export { CognitoUserProps, TableItem } from '~/types';
+export { TableItem, UserPropsFromCognito } from '~/types';
 
 export type MutableCognitoUserProps = Pick<
-  CognitoUserProps,
+  UserPropsFromCognito,
   'givenName' | 'familyName' | 'picture' | 'email'
 >;
 

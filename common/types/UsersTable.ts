@@ -1,6 +1,6 @@
-export interface UsersTable extends CognitoUserProps {}
+export type UsersTable = UserPropsFromCognito;
 
-export interface CognitoUserProps {
+export interface UserPropsFromCognito {
   username: string;
   sub: string;
   provider: 'SignInWithApple' | 'Google';

@@ -37,7 +37,7 @@ export class AppPipeline extends Construct {
 
     const synthStep = new ShellStep('Synth', {
       input: CodePipelineSource.connection(repo, gitBranch, { connectionArn }),
-      commands: ['npm ci -f', 'npm run synth'],
+      commands: ['npm ci', 'npm run synth'],
       primaryOutputDirectory,
     });
 

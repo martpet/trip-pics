@@ -1,13 +1,12 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'app-root-path';
 import { defineConfig } from 'vite';
-import pluginRewriteAll from 'vite-plugin-rewrite-all';
 import svgrPlugin from 'vite-plugin-svgr';
 
 import { localhostPort } from '../common/consts';
 
 export default defineConfig({
-  plugins: [react(), svgrPlugin(), pluginRewriteAll()],
+  plugins: [react(), svgrPlugin()],
   resolve: {
     alias: [{ find: '~', replacement: resolve('frontend/src') }],
   },
