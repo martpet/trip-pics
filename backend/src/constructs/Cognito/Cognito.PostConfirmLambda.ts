@@ -8,6 +8,7 @@ import { getCognitoUserProps } from './getCognitoUserProps';
 
 export const handler = async (event: PostConfirmationTriggerEvent) => {
   await createUserInDb(event);
+
   return event;
 };
 
@@ -31,8 +32,5 @@ async function createUserInDb(event: PostConfirmationTriggerEvent) {
     Item: usersTableItem,
   });
 
-  const response = await client.send(putItemCommand);
-
-  console.log('Table Item', usersTableItem);
-  console.log('Response', response);
+  return client.send(putItemCommand);
 }

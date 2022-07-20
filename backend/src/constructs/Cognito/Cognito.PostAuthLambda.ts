@@ -11,31 +11,25 @@ import { MutableCognitoUserProps } from './cognitoTypes';
 import { getCognitoUserProps } from './getCognitoUserProps';
 
 export const handler = async (event: PostAuthenticationTriggerEvent) => {
-  const props = getCognitoUserProps(event);
-  const { provider } = props;
+  await updateUsersTable(event);
 
-  if (provider === 'Google') {
-    await updateUsersTable(event);
-  }
   return event;
 };
 
 async function updateUsersTable(event: PostAuthenticationTriggerEvent) {
   const { username, givenName, familyName, picture, email } = getCognitoUserProps(event);
 
+  const { usersTableName, usersTableSchemaJson } = process.env;
+  const { partitionKey: pk } = JSON.parse(usersTableSchemaJson!) as SchemaOptions;
+  const usersTableKey = {
+    [pk.name]: { [pk.type]: username } as unknown as AttributeValue,
+  };
+
   const mutableProps: MutableCognitoUserProps = {
     givenName,
     familyName,
     picture,
     email,
-  };
-
-  const { usersTableName, usersTableSchemaJson } = process.env;
-  const { partitionKey } = JSON.parse(usersTableSchemaJson!) as SchemaOptions;
-  const usersTableKey = {
-    [partitionKey.name]: {
-      [partitionKey.type]: username,
-    } as unknown as AttributeValue,
   };
 
   const getItemCommand = new GetItemCommand({
@@ -57,7 +51,7 @@ async function updateUsersTable(event: PostAuthenticationTriggerEvent) {
 
   Object.entries(mutableProps).forEach(([propName, newVal]) => {
     const [dataType, oldVal] = Object.entries(Item[propName])[0];
-    if (newVal !== oldVal) {
+    if (newVal && newVal !== oldVal) {
       expressionActions.push(`#${propName} = :${propName}`);
       expressionAttributeNames[`#${propName}`] = propName;
       expressionAttributeValues[`:${propName}`] = {
@@ -78,10 +72,5 @@ async function updateUsersTable(event: PostAuthenticationTriggerEvent) {
     ExpressionAttributeValues: expressionAttributeValues,
   });
 
-  const response = await client.send(updateItemCommand);
-
-  console.log('expressionActions', expressionActions);
-  console.log('Response', response);
-
-  return event;
+  return client.send(updateItemCommand);
 }
