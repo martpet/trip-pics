@@ -1,12 +1,14 @@
-export type UsersTable = UserPropsFromCognito;
+export type UsersTable = UserPropsFromCognitoEvent;
 
-export interface UserPropsFromCognito {
+export interface UserPropsFromCognitoEvent {
   username: string;
   sub: string;
-  provider: 'SignInWithApple' | 'Google';
+  providerName: ProviderName;
   givenName: string;
   familyName: string;
-  picture: string;
+  picture?: string;
   email: string;
   dateCreated: number;
 }
+
+export type ProviderName = 'SignInWithApple' | 'Google';

@@ -6,7 +6,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { SchemaOptions } from 'aws-cdk-lib/aws-dynamodb';
 
-import { MutableCognitoUserProps, UserPropsFromCognito } from './cognitoTypes';
+import { MutableCognitoUserProps, UserPropsFromCognitoEvent } from './cognitoTypes';
 
 export async function updateDbUser({
   username,
@@ -14,7 +14,7 @@ export async function updateDbUser({
   familyName,
   picture,
   email,
-}: UserPropsFromCognito) {
+}: UserPropsFromCognitoEvent) {
   const { usersTableName, usersTableSchemaJson } = process.env;
   const { partitionKey: pk } = JSON.parse(usersTableSchemaJson!) as SchemaOptions;
   const usersTableKey = {

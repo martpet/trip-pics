@@ -23,6 +23,7 @@
   "include": [
     ".eslintrc.js",
     ".prettierrc.js",
-    "jest.config.ts"
+    "jest.config.ts",
+    "common/"
   ]
 }
