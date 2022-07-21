@@ -90,10 +90,9 @@ export class Cognito extends Construct {
 
     const userPool = new UserPool(this, 'UserPool', {
       removalPolicy: RemovalPolicy.DESTROY,
-      // todo: why the lambda triggers are not created?
       lambdaTriggers: {
-        postConfirmationLambda,
-        postAuthenticationLambda,
+        postConfirmation: postConfirmationLambda,
+        postAuthentication: postAuthenticationLambda,
       },
     });
 
@@ -110,7 +109,7 @@ export class Cognito extends Construct {
       target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
     });
 
-    const googleIdProvider = new UserPoolIdentityProviderGoogle(
+    const googleIdentityProvider = new UserPoolIdentityProviderGoogle(
       this,
       'GoogleIdentityProvider',
       {
@@ -127,7 +126,7 @@ export class Cognito extends Construct {
       }
     );
 
-    const appleIdProvider = new UserPoolIdentityProviderApple(
+    const appleIdentityProvider = new UserPoolIdentityProviderApple(
       this,
       'AppleIdentityProvider',
       {
@@ -156,8 +155,8 @@ export class Cognito extends Construct {
       },
     });
 
-    userPoolClient.node.addDependency(appleIdProvider);
-    userPoolClient.node.addDependency(googleIdProvider);
+    userPoolClient.node.addDependency(appleIdentityProvider);
+    userPoolClient.node.addDependency(googleIdentityProvider);
 
     this.userPoolClientId = userPoolClient.userPoolClientId;
     this.authDomain = authDomain;
