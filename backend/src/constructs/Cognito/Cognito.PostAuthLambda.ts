@@ -1,10 +1,10 @@
 import { PostAuthenticationTriggerEvent } from 'aws-lambda';
 
-import { getUserPropsFromEvent } from './getUserPropsFromEvent';
+import { getUserPropsFromCognitoEvent } from './getUserPropsFromCognitoEvent';
 import { updateDbUser } from './updateDbUser';
 
 export const handler = async (event: PostAuthenticationTriggerEvent) => {
-  const userProps = getUserPropsFromEvent(event);
+  const userProps = getUserPropsFromCognitoEvent(event);
   await updateDbUser(userProps);
   return event;
 };

@@ -2,7 +2,7 @@ import { PostConfirmationTriggerEvent } from 'aws-lambda';
 
 import { handler as postConfirmLambdaHandler } from '../Cognito.PostConfirmLambda';
 import { createDbUser } from '../createDbUser';
-import { getUserPropsFromEvent } from '../getUserPropsFromEvent';
+import { getUserPropsFromCognitoEvent } from '../getUserPropsFromCognitoEvent';
 
 jest.mock('../getUserPropsFromEvent');
 jest.mock('../createDbUser');
@@ -12,9 +12,9 @@ const event = Object.freeze({}) as PostConfirmationTriggerEvent;
 describe('postConfirmLambdaHandler', () => {
   test('Call createDbUser with props from getUserPropsFromEvent', async () => {
     const userProps = Object.freeze({});
-    (getUserPropsFromEvent as jest.Mock).mockReturnValue(userProps);
+    (getUserPropsFromCognitoEvent as jest.Mock).mockReturnValue(userProps);
     postConfirmLambdaHandler(event);
-    expect(getUserPropsFromEvent).toBeCalledWith(event);
+    expect(getUserPropsFromCognitoEvent).toBeCalledWith(event);
     expect(createDbUser).toBeCalledWith(userProps);
   });
 

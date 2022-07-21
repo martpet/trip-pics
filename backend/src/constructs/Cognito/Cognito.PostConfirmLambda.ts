@@ -1,10 +1,10 @@
 import { PostConfirmationTriggerEvent } from 'aws-lambda';
 
 import { createDbUser } from './createDbUser';
-import { getUserPropsFromEvent } from './getUserPropsFromEvent';
+import { getUserPropsFromCognitoEvent } from './getUserPropsFromCognitoEvent';
 
 export const handler = async (event: PostConfirmationTriggerEvent) => {
-  const userProps = getUserPropsFromEvent(event);
+  const userProps = getUserPropsFromCognitoEvent(event);
   await createDbUser(userProps);
   return event;
 };
