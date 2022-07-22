@@ -1,6 +1,4 @@
-export type UsersTable = UserPropsFromCognitoEvent;
-
-export interface UserPropsFromCognitoEvent {
+export type UserProps = {
   username: string;
   sub: string;
   providerName: ProviderName;
@@ -9,6 +7,6 @@ export interface UserPropsFromCognitoEvent {
   picture?: string;
   email: string;
   dateCreated: number;
-}
+};
 
 export type ProviderName = 'SignInWithApple' | 'Google';

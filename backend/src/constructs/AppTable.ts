@@ -1,11 +1,11 @@
 import { BillingMode, Table, TableProps } from 'aws-cdk-lib/aws-dynamodb';
 import { IConstruct } from 'constructs';
 
-import { UsersTable } from '~/types';
+import { UserProps } from '~/types';
 
 interface AppTableProps extends Omit<TableProps, 'partitionKey'> {
   partitionKey: {
-    name: keyof UsersTable;
+    name: keyof UserProps;
     type: TableProps['partitionKey']['type'];
   };
   billingMode?: TableProps['billingMode'];

@@ -33,5 +33,5 @@ The full domain will look like *__chosen-name__.dev.domain.com*
 
 ----
 
-Check also: [Setup Production, Staging and DevService accounts](README-setup-envs.md)
+Check also: [Setup AWS accounts](README-setup-envs.md)
 

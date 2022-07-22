@@ -10,7 +10,7 @@ interface Props {
   roleArn?: string;
 }
 
-export const getIdPSecrets = (
+export const getIdentityProviderSecrets = (
   scope: Construct,
   { googleParam, appleParam, roleArn }: Props
 ) => {

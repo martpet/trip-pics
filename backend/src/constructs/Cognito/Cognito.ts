@@ -14,7 +14,7 @@ import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
 
-import { getIdPSecrets } from './getIdPSecrets';
+import { getIdentityProviderSecrets } from './getIdentityProviderSecrets';
 
 interface CognitoProps {
   envDomain: string;
@@ -60,39 +60,39 @@ export class Cognito extends Construct {
 
     const authDomain = `${authSubdomain}.${envDomain}`;
 
-    const { googleSecret, appleSecret } = getIdPSecrets(this, {
+    const { googleSecret, appleSecret } = getIdentityProviderSecrets(this, {
       googleParam: googleClientSecretParamName,
       appleParam: applePrivateKeyParamName,
       roleArn: authSecretsAssumeRoleArn,
     });
 
-    const userPoolLambdasProps = {
+    const cognitoLambdaProps = {
       environment: {
         usersTableName: usersTable.tableName,
-        usersTableSchemaJson: JSON.stringify(usersTable.schema()),
+        usersParitionKey: usersTable.schema().partitionKey.name,
       },
     };
 
-    const postConfirmationLambda = new NodejsFunction(
+    const postConfirmation = new NodejsFunction(
       this,
-      'PostConfirmLambda',
-      userPoolLambdasProps
+      'PostConfirmation',
+      cognitoLambdaProps
     );
 
-    const postAuthenticationLambda = new NodejsFunction(
+    const postAuthentication = new NodejsFunction(
       this,
-      'PostAuthLambda',
-      userPoolLambdasProps
+      'PostAuthentication',
+      cognitoLambdaProps
     );
 
-    usersTable.grantReadWriteData(postConfirmationLambda);
-    usersTable.grantReadWriteData(postAuthenticationLambda);
+    usersTable.grantReadWriteData(postConfirmation);
+    usersTable.grantReadWriteData(postAuthentication);
 
     const userPool = new UserPool(this, 'UserPool', {
       removalPolicy: RemovalPolicy.DESTROY,
       lambdaTriggers: {
-        postConfirmation: postConfirmationLambda,
-        postAuthentication: postAuthenticationLambda,
+        postConfirmation,
+        postAuthentication,
       },
     });
 

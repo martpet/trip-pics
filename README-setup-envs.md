@@ -1,6 +1,6 @@
-# Setup *Production*, *Staging* and *DevService* accounts
+# Setup *Production*, *Staging* and *DevService* AWS accounts
 
-## Setup AWS Organizations
+## AWS Organizations
 * Create `Production`, `Staging` and `DevService` accounts.
 * Create a `Dev` unit.
 
@@ -52,7 +52,7 @@ In the *DevService* account create a policy named `HostedZoneRecords`.
     }
 </details>
 
-### Register a domain
+### Add a domain name
 
 In the *HostedZones* account:
 
@@ -109,7 +109,7 @@ Setup OAuth for each environment (Dev, Staging and Production):
 26. Copy the name of the string parameter to a single variable named `applePrivateKeyParamName` in *backend/consts/appConsts.ts*.
 </details>
 
-### Create a policy for reading the *Dev* identity provider secrets
+### Add a policy for reading the *Dev* identity provider secrets
 
 In the *DevService* account add a policy named `IdentityProvidersSecrets`.
 
@@ -131,7 +131,7 @@ In the *DevService* account add a policy named `IdentityProvidersSecrets`.
     }
 </details>
 
-## Add a role to be assumed by the dev accounts
+## Role for personal dev accounts
 
 In the *DevService* account create a role named `DevAccountServiceRole`.
 
@@ -167,17 +167,17 @@ Copy the ARN of *DevAccountServiceRole* role to a variable named `devAccountServ
 
 ---
 
-# Creating developer accounts
+# How to add developers to project
 
 Developers need permissions to assume the *DevAccountServiceRole* from the *DevService* AWS account.
 
 There are two options:
 
 * Create a personal account in the *Dev* organizational unit.
-* Add permissions for an existing account to assume the *DevAccountServiceRole*.
+* Add permissions for their own account to assume the *DevAccountServiceRole*.
 
 <details>
-    <summary>Permissions for an existing account to asssume DevAccountServiceRole</summary>
+    <summary>Permissions for their own account to asssume DevAccountServiceRole</summary>
 
      {
         "Effect": "Allow",
@@ -199,7 +199,3 @@ and
 [Sign in with Apple](https://developer.apple.com/account)
 * Add `auth.<USER-DOMAIN>` to *Domains and Subdomains*.
 * Add `https://auth.<USER-DOMAIN>/oauth2/idpresponse` to *Return URLs*.
-
-----
-
-Check also: [Setup personal dev account](README.md)

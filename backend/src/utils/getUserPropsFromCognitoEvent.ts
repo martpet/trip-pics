@@ -1,14 +1,14 @@
 import { PostAuthenticationTriggerEvent, PostConfirmationTriggerEvent } from 'aws-lambda';
 
-import { CognitoIdentity, ProviderName, UserPropsFromCognitoEvent } from './cognitoTypes';
+import { CognitoIdentity, ProviderName, UserPropsFromCognito } from '~/types';
 
 export const getUserPropsFromCognitoEvent = (
   event: PostConfirmationTriggerEvent | PostAuthenticationTriggerEvent
-) => {
+): UserPropsFromCognito => {
   const { userAttributes } = event.request;
   const identity = JSON.parse(userAttributes.identities)[0] as CognitoIdentity;
 
-  const props: UserPropsFromCognitoEvent = {
+  return {
     username: event.userName,
     sub: userAttributes.sub,
     providerName: identity.providerName as ProviderName,
@@ -18,6 +18,4 @@ export const getUserPropsFromCognitoEvent = (
     email: userAttributes.email,
     dateCreated: identity.dateCreated,
   };
-
-  return props;
 };
