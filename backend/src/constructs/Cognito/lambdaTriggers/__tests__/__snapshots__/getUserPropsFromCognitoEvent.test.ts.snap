@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getUserPropsFromCognitoEvent Return user props 1`] = `
+Object {
+  "dateCreated": 1658604803064,
+  "email": "name@email.com",
+  "familyName": "Doe",
+  "givenName": "John",
+  "picture": "https://lh3.googleusercontent.com/a/asdf",
+  "providerName": "Google",
+  "sub": "lkjasdflk-adslfkj-asdfasd",
+  "username": "someuser",
+}
+`;

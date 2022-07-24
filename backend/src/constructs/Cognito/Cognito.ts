@@ -66,24 +66,22 @@ export class Cognito extends Construct {
       roleArn: authSecretsAssumeRoleArn,
     });
 
-    const cognitoLambdaProps = {
+    const lambdaTriggersProps = {
       environment: {
         usersTableName: usersTable.tableName,
         usersParitionKey: usersTable.schema().partitionKey.name,
       },
     };
 
-    const postConfirmation = new NodejsFunction(
-      this,
-      'PostConfirmation',
-      cognitoLambdaProps
-    );
+    const postConfirmation = new NodejsFunction(this, 'PostConfirmation', {
+      ...lambdaTriggersProps,
+      entry: `${__dirname}/lambdaTriggers/postConfirmation/postConfirmation.ts`,
+    });
 
-    const postAuthentication = new NodejsFunction(
-      this,
-      'PostAuthentication',
-      cognitoLambdaProps
-    );
+    const postAuthentication = new NodejsFunction(this, 'PostAuthentication', {
+      ...lambdaTriggersProps,
+      entry: `${__dirname}/lambdaTriggers/postAuthentication/postAuthentication.ts`,
+    });
 
     usersTable.grantReadWriteData(postConfirmation);
     usersTable.grantReadWriteData(postAuthentication);

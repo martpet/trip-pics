@@ -1,1 +1,1 @@
-export * from './getChangedProps';
+export * from './filterChangedProps';

@@ -2,22 +2,16 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { PostConfirmationTriggerEvent } from 'aws-lambda';
 
-import { getUserPropsFromCognitoEvent } from '~/utils';
+import { getUserPropsFromCognitoEvent } from '../getUserPropsFromCognitoEvent';
 
-const ddbClient = new DynamoDBClient({});
 const marshallOptions = { removeUndefinedValues: true };
+const ddbClient = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient, { marshallOptions });
-const { usersTableName } = process.env;
 
-export async function handler(event: PostConfirmationTriggerEvent) {
-  await createUser(event);
-  return event;
-}
-
-async function createUser(event: PostConfirmationTriggerEvent) {
+export const createUserFromEvent = async (event: PostConfirmationTriggerEvent) => {
   const params = {
-    TableName: usersTableName,
+    TableName: process.env.usersTableName,
     Item: getUserPropsFromCognitoEvent(event),
   };
   return ddbDocClient.send(new PutCommand(params));
-}
+};

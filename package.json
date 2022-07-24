@@ -6,7 +6,7 @@
   },
   "scripts": {
     "start": "vite serve frontend",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test-all": "npm run check && npm run lint && npm test",
     "check": "npm run check:frontend && npm run check:backend",
     "check:frontend": "tsc --project frontend/tsconfig.json",
@@ -48,6 +48,7 @@
     "@typescript-eslint/parser": "^5.27.1",
     "@vitejs/plugin-react": "^2.0.0",
     "aws-cdk": "2.33.0",
+    "aws-sdk-client-mock": "^1.0.0",
     "eslint": "^8.17.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",

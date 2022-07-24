@@ -4,26 +4,21 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { AttributeValue, PostAuthenticationTriggerEvent } from 'aws-lambda';
 
 import { UserProps } from '~/types';
-import { getChangedProps, getUserPropsFromCognitoEvent } from '~/utils';
+import { filterChangedProps } from '~/utils';
 
-const ddbClient = new DynamoDBClient({});
+import { getUserPropsFromCognitoEvent } from '../getUserPropsFromCognitoEvent';
+
 const marshallOptions = { removeUndefinedValues: true };
+const ddbClient = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient, { marshallOptions });
-const { usersTableName, usersParitionKey } = process.env;
-const usersPKey = usersParitionKey as keyof UserProps;
 
-export async function handler(event: PostAuthenticationTriggerEvent) {
-  await updateUserIfNeeded(event);
-  return event;
-}
-
-async function updateUserIfNeeded(event: PostAuthenticationTriggerEvent) {
+export const updateUserFromEvent = async (event: PostAuthenticationTriggerEvent) => {
   const newProps = getUserPropsFromCognitoEvent(event);
   const oldProps = await fetchUser(newProps);
-  const changedProps = getChangedProps(newProps, oldProps);
+  const changedProps = filterChangedProps(newProps, oldProps);
   if (!changedProps) return undefined;
   return updateUser(changedProps);
-}
+};
 
 async function fetchUser(props: UserProps) {
   const params = makeUserTableParams(props);
@@ -31,7 +26,7 @@ async function fetchUser(props: UserProps) {
   return Item as UserProps;
 }
 
-async function updateUser(props: UserProps) {
+function updateUser(props: UserProps) {
   const actions: string[] = [];
   const ExpressionAttributeNames: Record<string, string> = {};
   const ExpressionAttributeValues: Record<string, AttributeValue> = {};
@@ -50,8 +45,10 @@ async function updateUser(props: UserProps) {
 }
 
 function makeUserTableParams(props: UserProps) {
+  const { usersTableName, usersParitionKey } = process.env!;
+  const pKey = usersParitionKey as keyof UserProps;
   return {
     TableName: usersTableName,
-    Key: { [usersPKey]: props[usersPKey] },
+    Key: { [pKey]: props[pKey] },
   };
 }
